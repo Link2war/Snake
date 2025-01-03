@@ -24,8 +24,10 @@ int main()
         bbopCleanWindow(window,Vector3i(0,0,0),1.0f);
         
         
-        if (game.isAlive())game.update();
-        else game = Game(window);
+        if (game.launched()) game.update();
+        else game.reset();
+
+        // FAIRE UNE FONCTION START ET UNE FONCTION PLAY
 
 
         
