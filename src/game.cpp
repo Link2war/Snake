@@ -4,7 +4,7 @@
 Game::Game(GLFWwindow * window_) :
     window(window_),
     camera(Vector2f(BBOP_WINDOW_RESOLUTION.x/2, BBOP_WINDOW_RESOLUTION.y/2), 0.6),
-    background(new Sprite("sprite/sol/716.png")),
+    background(new Sprite("sprite/sol/512-2.png")),
     serpent(new Serpent(BBOP_WINDOW_RESOLUTION.x/2 - 128 + 16, BBOP_WINDOW_RESOLUTION.y/2 -12)),
     fruit(new Sprite("sprite/fruit/0.png")),
     offsetX((BBOP_WINDOW_RESOLUTION.x - background->getSize().x) / 2),
