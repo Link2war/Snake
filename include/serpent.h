@@ -119,7 +119,7 @@ class Serpent
         @note - Un block pour la tête
         @note - Un block pour le corps
         @note - Un block pour la queue */
-        Serpent();
+        Serpent(float x, float y);
 
         /* @brief Destructeur de la classe Serpent
         @note Désalloue tous les pointeurs de type Block */

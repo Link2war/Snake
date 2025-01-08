@@ -134,9 +134,8 @@ Block * Block::getSuivant()
 
 
 
-Serpent::Serpent() : 
-    position_defaut(704+160+16, 288+256+16),
-    tete(new Block(Texture("sprite/snake/defaut/0.png"), position_defaut.x, position_defaut.y)),
+Serpent::Serpent(float x, float y) : 
+    tete(new Block(Texture("sprite/snake/defaut/0.png"), x, y)),
     queue(nullptr)
     
 {
@@ -175,12 +174,7 @@ void Serpent::update(std::string direction)
 
 void Serpent::addBlock()
 {
-    if (tete == nullptr) // si le serpent n'a pas de tête
-    {
-        tete = new Block("sprite/snake/defaut/0.png", position_defaut.x, position_defaut.y);
-    }
-
-    else if (tete->suivant == nullptr) // si le serpent n'est constitué que d'une tête
+    if (tete->suivant == nullptr) // si le serpent n'est constitué que d'une tête
     {
         Block * new_block = new Block("sprite/snake/defaut/1.png", tete->depart.x-32, tete->depart.y);
         tete->suivant = queue = new_block;
@@ -210,7 +204,7 @@ void Serpent::addBlock()
 
 bool Serpent::OutOfBounds(float offsetX, float offsetY)
 {   
-    if (tete->position.x -16 < offsetX || tete->position.x -16 > offsetX+512-32 || tete->position.y -16 < offsetY || tete->position.y -16 > offsetY+512-32) return true; 
+    if (tete->position.x -16 < offsetX+102 || tete->position.x -16 > offsetX+512+102-32 || tete->position.y -16 < offsetY+102 || tete->position.y -16 > offsetY+512+102-32) return true; 
     return false;
 }
 

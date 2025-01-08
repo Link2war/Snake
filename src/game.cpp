@@ -3,18 +3,18 @@
 
 Game::Game(GLFWwindow * window_) :
     window(window_),
-    camera(Vector2f(BBOP_WINDOW_SIZE.x/2, BBOP_WINDOW_SIZE.y/2), 0.7),
-    offsetX(704),
-    offsetY(288),
-    background(new Sprite("sprite/sol/512.png")),
-    serpent(new Serpent()),
+    camera(Vector2f(BBOP_WINDOW_RESOLUTION.x/2, BBOP_WINDOW_RESOLUTION.y/2), 0.6),
+    background(new Sprite("sprite/sol/716.png")),
+    serpent(new Serpent(BBOP_WINDOW_RESOLUTION.x/2 - 128 + 16, BBOP_WINDOW_RESOLUTION.y/2 -12)),
     fruit(new Sprite("sprite/fruit/0.png")),
+    offsetX((BBOP_WINDOW_RESOLUTION.x - background->getSize().x) / 2),
+    offsetY((BBOP_WINDOW_RESOLUTION.y - background->getSize().y) / 2 + 4),
     is_playing(false),
     launch(true),
     direction("none")
 {
     background->setPosition(offsetX, offsetY);
-    fruit->setPosition(offsetX+352, offsetY+256);
+    fruit->setPosition(offsetX + background->getSize().x/2 + 128, offsetY + background->getSize().y/2 - 32);
 }
 
 Game::~Game()
@@ -33,8 +33,8 @@ void Game::reset()
     direction = "none";
 
     delete serpent;
-    serpent = new Serpent();
-    fruit->setPosition(offsetX+352, offsetY+256);
+    serpent = new Serpent(BBOP_WINDOW_RESOLUTION.x/2 - 128 + 16, BBOP_WINDOW_RESOLUTION.y/2 -12);
+    fruit->setPosition(offsetX + background->getSize().x/2 + 128, offsetY + background->getSize().y/2 - 32);
 }
 
 void Game::getDirection()
@@ -125,16 +125,17 @@ void Game::setFruit()
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> distrib(1, 16);
-    int x = distrib(gen) * 32 + offsetX -32;
-    int y = distrib(gen) * 32 + offsetY -32;
+    int x = distrib(gen) * 32 + offsetX+102 -32;
+    int y = distrib(gen) * 32 + offsetY+102 -32;
+
 
     Block * block = serpent->getTete();
     while (block != nullptr)
     {
         if (x == block->getPosition().x && y== block->getPosition().y)
         {
-            if (x == block->getPosition().x) x = distrib(gen) * 32 + offsetX -32;
-            else y = distrib(gen) * 32 + offsetY -32;
+            if (x == block->getPosition().x) x = distrib(gen) * 32 + offsetX+102 -32;
+            else y = distrib(gen) * 32 + offsetY+102 -32;
             block = serpent->getTete();
         }
 

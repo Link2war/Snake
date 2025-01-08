@@ -19,12 +19,12 @@ class Game
         Scene scene; // Scène de jeu
         Camera camera; // Caméra du jeu
 
-        float offsetX; // Offset de largeur
-        float offsetY; // Offset de hauteur
-
         Sprite * background; // Pointeur du sprite d'arrière plan
         Serpent * serpent; // Pointeur du serpent utilisé par le joueur
         Sprite * fruit; // Pointeur du sprite de l'objet à collecter
+
+        float offsetX; // Offset de largeur
+        float offsetY; // Offset de hauteur
 
         bool is_playing; // État de la partie
         bool launch; // lancement de la partie

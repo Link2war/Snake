@@ -23,9 +23,11 @@ int main()
         // clear de la fenêtre en noire
         bbopCleanWindow(window,Vector3i(0,0,0),1.0f);
         
-        
         if (game.launched()) game.update();
         else game.reset();
+
+        
+
 
         // FAIRE UNE FONCTION START ET UNE FONCTION PLAY
 
