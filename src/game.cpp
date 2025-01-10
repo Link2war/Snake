@@ -3,9 +3,9 @@
 
 Game::Game(GLFWwindow * window_) :
     window(window_),
-    camera(Vector2f(BBOP_WINDOW_RESOLUTION.x/2, BBOP_WINDOW_RESOLUTION.y/2), 0.6),
+    menu(new Menu()),
     background(new Sprite("sprite/sol/716.png")),
-    serpent(new Serpent(BBOP_WINDOW_RESOLUTION.x/2 - 128 + 16, BBOP_WINDOW_RESOLUTION.y/2 -12)),
+    serpent(new Serpent(BBOP_WINDOW_RESOLUTION.x/2 - 128 + 16, BBOP_WINDOW_RESOLUTION.y/2 - 12)),
     fruit(new Sprite("sprite/fruit/0.png")),
     offsetX((BBOP_WINDOW_RESOLUTION.x - background->getSize().x) / 2),
     offsetY((BBOP_WINDOW_RESOLUTION.y - background->getSize().y) / 2 + 4),
@@ -22,8 +22,52 @@ Game::~Game()
     std::cout << "Vous êtes mort" << std::endl;
 
     delete serpent;
+    serpent = nullptr;
     
     std::cout << "destruction des objets réussis" << std::endl;
+}
+
+void Game::update()
+{
+    scene.Use();
+
+    if (menu->pressStart() == false) 
+    {
+        Draw();
+
+        menu->onStart(window);
+        menu->onSettings(window);
+        menu->checkStart(window);
+        menu->Draw(scene);
+    }
+
+    else
+    {
+        getDirection();
+        if (direction != "none")
+        {
+            checkFruit();
+            serpent->update(direction);
+            if(serpent->isDead(offsetX, offsetY)) launch = false;
+        }
+
+        Draw();
+    }    
+}
+
+void Game::Draw()
+{
+    
+    scene.Draw(*background);
+
+    Block * block = serpent->getTete();
+    while (block != nullptr)
+    {
+        scene.Draw(*block->getSprite());
+        block = block->getSuivant();
+    }
+
+    scene.Draw(*fruit);
 }
 
 void Game::reset()
@@ -33,15 +77,17 @@ void Game::reset()
     direction = "none";
 
     delete serpent;
-    serpent = new Serpent(BBOP_WINDOW_RESOLUTION.x/2 - 128 + 16, BBOP_WINDOW_RESOLUTION.y/2 -12);
+    serpent = new Serpent(BBOP_WINDOW_RESOLUTION.x/2 - 128 + 16, BBOP_WINDOW_RESOLUTION.y/2 - 12);
     fruit->setPosition(offsetX + background->getSize().x/2 + 128, offsetY + background->getSize().y/2 - 32);
+
+    menu->reset();
 }
 
 void Game::getDirection()
 {
     if (direction == "none")
     {
-        if ((glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS))
+        if ((glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS))
         {
             direction = "up";
         }
@@ -56,7 +102,7 @@ void Game::getDirection()
     }
     else
     {
-        if ((glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) && serpent->getDirection() != "down")
+        if ((glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) && serpent->getDirection() != "down")
         {
             direction = "up";
         }
@@ -75,36 +121,6 @@ void Game::getDirection()
     }
 
     if(is_playing == false && direction != "none") is_playing = true;
-}
-
-void Game::Draw()
-{
-    scene.Use();
-    scene.Draw(*background);
-
-    Block * block = serpent->getTete();
-    while (block != nullptr)
-    {
-        scene.Draw(*block->getSprite());
-        block = block->getSuivant();
-    }
-
-    scene.Draw(*fruit);
-}
-
-void Game::update()
-{
-    scene.useCamera(&camera);
-    getDirection();
-
-    if (is_playing) 
-    {
-        checkFruit();
-        serpent->update(direction);
-
-        if(serpent->isDead(offsetX, offsetY)) launch = false;
-    }
-    Draw();
 }
 
 bool Game::launched()

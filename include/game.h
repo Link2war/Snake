@@ -11,6 +11,7 @@
 #include <random>
 
 #include "serpent.h"
+#include "menu.h"
 
 class Game
 {
@@ -18,6 +19,8 @@ class Game
         GLFWwindow * window; // Fenêtre glfw
         Scene scene; // Scène de jeu
         Camera camera; // Caméra du jeu
+
+        Menu * menu;
 
         Sprite * background; // Pointeur du sprite d'arrière plan
         Serpent * serpent; // Pointeur du serpent utilisé par le joueur

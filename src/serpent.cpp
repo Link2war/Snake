@@ -33,7 +33,7 @@ void Block::update()
 
 bool Block::onCase()
 {
-    if (int(position.x - sprite->getOrigin().x) %32 == 0 && int(position.y - sprite->getOrigin().y) %32 == 0) // une case fait 32/32
+    if (int(position.x - 16) %32 == 0 && int(position.y + 4) %32 == 0) // une case fait 32/32
     {
         return true;
     }

@@ -12,7 +12,7 @@ int main()
     GLFWwindow * window;
 
     //initialisation de la lib
-    bbopInit(1920,1080,"Snake",window);
+    bbopInit(1280,720,"Snake",window);
 
 
     Game game(window);
