@@ -70,6 +70,8 @@ int main()
 
     //initialisation de la lib
     bbopInit(1280,720,"Snake",window);
+    glfwMaximizeWindow(window);
+    
 
     std::cout << "Initialisation de la Partie" << std::endl;
     Game * game = new Game(window);
@@ -82,6 +84,7 @@ int main()
     {
         // clear de la fenêtre en noire
         bbopCleanWindow(window,Vector3i(0,0,0),1.0f);
+        
 
         switch (STATE)
         {
@@ -130,6 +133,9 @@ int main()
 
     delete game;
     game = nullptr;
+
+    delete menu;
+    menu = nullptr;
 
     // destruction de la fen^tre et fin de glfw
     glfwDestroyWindow(window);
