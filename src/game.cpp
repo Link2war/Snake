@@ -1,20 +1,23 @@
 #include "../include/game.h"
 
 
-Game::Game(GLFWwindow * window_) :
-    window(window_),
-    menu(new Menu()),
-    background(new Sprite("sprite/sol/716.png")),
-    serpent(new Serpent(BBOP_WINDOW_RESOLUTION.x/2 - 128 + 16, BBOP_WINDOW_RESOLUTION.y/2 - 12)),
+Game::Game(GLFWwindow * _window) :
+    window(_window),
+    background(new Sprite("sprite/background/0.png")),
+    ground(new Sprite("sprite/ground/0.png")),
+    offsetX((BBOP_WINDOW_RESOLUTION.x - ground->getSize().x) / 2),
+    offsetY((BBOP_WINDOW_RESOLUTION.y - ground->getSize().y) / 2),
+    serpent(new Serpent((offsetX + ground->getSize().x/2 - 80), offsetY + (ground->getSize().y/2)+16)),
     fruit(new Sprite("sprite/fruit/0.png")),
-    offsetX((BBOP_WINDOW_RESOLUTION.x - background->getSize().x) / 2),
-    offsetY((BBOP_WINDOW_RESOLUTION.y - background->getSize().y) / 2 + 4),
-    is_playing(false),
-    launch(true),
+    
+    is_dead(false),
+    start(false),
     direction("none")
 {
-    background->setPosition(offsetX, offsetY);
-    fruit->setPosition(offsetX + background->getSize().x/2 + 128, offsetY + background->getSize().y/2 - 32);
+    ground->setPosition(offsetX, offsetY);
+    fruit->setPosition(offsetX + ground->getSize().x/2 + 96, offsetY + ground->getSize().y/2);
+
+    std::cout << "Game Initialisée" << std::endl;
 }
 
 Game::~Game()
@@ -24,41 +27,33 @@ Game::~Game()
     delete serpent;
     serpent = nullptr;
     
-    std::cout << "destruction des objets réussis" << std::endl;
+    std::cout << "Destruction des objets réussis" << std::endl;
 }
 
 void Game::update()
 {
     scene.Use();
 
-    if (menu->pressStart() == false) 
+    getDirection();
+    if (direction != "none")
     {
-        Draw();
+        checkFruit();
+        serpent->update(direction);
 
-        menu->onStart(window);
-        menu->onSettings(window);
-        menu->checkStart(window);
-        menu->Draw(scene);
+        if(serpent->Hit() || serpent->OutOfBounds(offsetX, offsetY)) 
+        {
+            is_dead = true;
+        }
     }
 
-    else
-    {
-        getDirection();
-        if (direction != "none")
-        {
-            checkFruit();
-            serpent->update(direction);
-            if(serpent->isDead(offsetX, offsetY)) launch = false;
-        }
-
-        Draw();
-    }    
+    Draw();
 }
+
 
 void Game::Draw()
 {
-    
     scene.Draw(*background);
+    scene.Draw(*ground);
 
     Block * block = serpent->getTete();
     while (block != nullptr)
@@ -72,15 +67,13 @@ void Game::Draw()
 
 void Game::reset()
 {
-    is_playing = false;
-    launch = true;
+    is_dead = false;
+    start = false;
     direction = "none";
 
     delete serpent;
-    serpent = new Serpent(BBOP_WINDOW_RESOLUTION.x/2 - 128 + 16, BBOP_WINDOW_RESOLUTION.y/2 - 12);
-    fruit->setPosition(offsetX + background->getSize().x/2 + 128, offsetY + background->getSize().y/2 - 32);
-
-    menu->reset();
+    serpent = new Serpent((offsetX + ground->getSize().x/2 - 80), offsetY + (ground->getSize().y/2)+16);
+    fruit->setPosition(offsetX + ground->getSize().x/2 + 96, offsetY + ground->getSize().y/2);
 }
 
 void Game::getDirection()
@@ -120,17 +113,12 @@ void Game::getDirection()
         }
     }
 
-    if(is_playing == false && direction != "none") is_playing = true;
+    if(start == false && direction != "none") start = true;
 }
 
-bool Game::launched()
+bool Game::isDead()
 {
-    return launch;
-}
-
-bool Game::isPlaying()
-{
-    return is_playing;
+    return is_dead;
 }
 
 void Game::setFruit()
@@ -140,9 +128,9 @@ void Game::setFruit()
 
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<> distrib(1, 16);
-    int x = distrib(gen) * 32 + offsetX+102 -32;
-    int y = distrib(gen) * 32 + offsetY+102 -32;
+    std::uniform_int_distribution<> distrib(0, 15);
+    int x = distrib(gen) * 32 + offsetX;
+    int y = distrib(gen) * 32 + offsetY;
 
 
     Block * block = serpent->getTete();
@@ -150,8 +138,8 @@ void Game::setFruit()
     {
         if (x == block->getPosition().x && y== block->getPosition().y)
         {
-            if (x == block->getPosition().x) x = distrib(gen) * 32 + offsetX+102 -32;
-            else y = distrib(gen) * 32 + offsetY+102 -32;
+            if (x == block->getPosition().x) x = distrib(gen) * 32 + offsetX;
+            else y = distrib(gen) * 32 + offsetY;
             block = serpent->getTete();
         }
 

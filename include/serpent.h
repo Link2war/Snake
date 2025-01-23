@@ -43,8 +43,6 @@ class Block
         @note Utilisé pour les changements de direction */
         bool onCase(); 
 
-        void animate();
-
         /* @brief Déplacement du block vers le haut
         @note Met à jour la position 
         @note - position.y -= vitesse */
@@ -146,10 +144,6 @@ class Serpent
 
         // @brief Vérifie si le serpent s'est mordue la queue
         bool Hit();
-
-        /* @brief Retourne true si le joueur est mort sinon false
-        @note Récupéré par Game pour mettre à jour l'état de la partie */
-        bool isDead(float offsetX, float offsetY);
 
         /* @brief Retourne le pointeur du block de tête du serpent 
         @note Récupéré par le Game */

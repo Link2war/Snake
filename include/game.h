@@ -1,7 +1,5 @@
 #pragma once
 
-#include <BBOP/Graphics/cameraClass.h>
-#include <BBOP/Graphics/fontsClass.h>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <BBOP/Graphics.h>
@@ -18,19 +16,20 @@ class Game
     private :
         GLFWwindow * window; // Fenêtre glfw
         Scene scene; // Scène de jeu
-        Camera camera; // Caméra du jeu
-
-        Menu * menu;
 
         Sprite * background; // Pointeur du sprite d'arrière plan
-        Serpent * serpent; // Pointeur du serpent utilisé par le joueur
-        Sprite * fruit; // Pointeur du sprite de l'objet à collecter
+        Sprite * ground; // sol du jeu
 
         float offsetX; // Offset de largeur
         float offsetY; // Offset de hauteur
+        
+        Serpent * serpent; // Pointeur du serpent utilisé par le joueur
+        Sprite * fruit; // Pointeur du sprite de l'objet à collecter
 
-        bool is_playing; // État de la partie
-        bool launch; // lancement de la partie
+        
+
+        bool is_dead; // État de la partie
+        bool start; // lancement de la partie
         std::string direction; // Input de direction
 
     public :
@@ -71,15 +70,10 @@ class Game
         */
         void update(); 
 
-        /* @brief Retourne true si la partie est en cours sinon false
-        @note Récupéré à chaque frame pour mettre à jour l'état de la partie
-        */
-        bool isPlaying();
-
         /* @brief Retourne true si la partie est lancée, passe à false quand la partie est terminée
         @note Récupéré par le main pour démarrer une partie
         */
-        bool launched();
+        bool isDead();
 
         /* @brief Affiche tous les objets du jeu
         @note - Scène

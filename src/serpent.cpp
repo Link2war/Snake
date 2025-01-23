@@ -33,7 +33,7 @@ void Block::update()
 
 bool Block::onCase()
 {
-    if (int(position.x - 16) %32 == 0 && int(position.y + 4) %32 == 0) // une case fait 32/32
+    if (int(position.x - 16) %32 == 0 && int(position.y + 8) %32 == 0) // une case fait 32/32
     {
         return true;
     }
@@ -204,7 +204,7 @@ void Serpent::addBlock()
 
 bool Serpent::OutOfBounds(float offsetX, float offsetY)
 {   
-    if (tete->position.x -16 < offsetX+102 || tete->position.x -16 > offsetX+512+102-32 || tete->position.y -16 < offsetY+102 || tete->position.y -16 > offsetY+512+102-32) return true; 
+    if (tete->position.x -16 < offsetX || tete->position.x -16 > offsetX+512-32 || tete->position.y -16 < offsetY || tete->position.y -16 > offsetY+512-32) return true; 
     return false;
 }
 
@@ -216,12 +216,6 @@ bool Serpent::Hit()
         if (tete->arrivee.x == block->arrivee.x && tete->arrivee.y == block->arrivee.y) return true;
         block = block->suivant;
     }
-    return false;
-}
-
-bool Serpent::isDead(float offsetX, float offsetY)
-{
-    if (OutOfBounds(offsetX, offsetY) || Hit()) return true;
     return false;
 }
 
