@@ -114,7 +114,6 @@ Menu::~Menu()
     do 
     {
         temp = current_button->next; // Sauvegarde le prochain élément
-        delete current_button->sprite; // Supprime le sprite associé
         delete current_button; // Supprime le bouton actuel
         current_button = temp; // Passe au suivant
     } 
@@ -163,7 +162,6 @@ Button *  Menu::update()
                 break;
 
             case menu_select :
-                std::cout << "select " << current_button->name << std::endl;
                 released = false; 
                 released_t = glfwGetTime();
 

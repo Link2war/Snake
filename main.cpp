@@ -8,34 +8,56 @@
 enum main_state 
 {
     in_game=0,
-    in_end_game=1,
-    in_menu=2,
-    in_settings=3,
-    leaving=4
+    in_menu=1,
+    in_settings=2,
+    leaving=3
 };
 
 main_state STATE = in_menu;
 
-void startMenu(Menu *menu, Game* game, Scene scene)
+// laps de temps après avoir appuyé sur un bouton
+void halfTime(bool &released, double &released_t, Button *&button, enum main_state etat)
+{
+    if (!released)
+    {
+        released_t = glfwGetTime();
+        released = true; 
+        std::string path = "sprite/iu/button/" + button->name + "_2.png";
+        button->sprite->setTexture(path.c_str());
+    }
+    else if (glfwGetTime() - released_t > 0.3) 
+    {
+        released = false;
+        std::string path;
+
+        if (button->name == "start") path = "sprite/iu/button/" + button->name + "_1.png";
+        else path = "sprite/iu/button/" + button->name + "_0.png";
+        button->sprite->setTexture(path.c_str());
+
+        STATE = etat;
+    }
+}
+
+void startMenu(Menu *menu, Game* game, Scene scene, bool &released, double &released_t, Button *&button)
 {
     scene.Use();
     game->Draw();
 
-    Button * button = menu->update();
+    if (released == false) button = menu->update();
 
     if(button != nullptr)
     {
         if (button->name == "start")
         {
-            STATE = in_game;
+            halfTime(released, released_t, button, in_game);
         }
         else if(button->name == "settings")
         {
-            STATE = in_settings;
+            halfTime(released, released_t, button, in_settings);
         }
         else if(button->name == "exit")
         {
-            STATE = leaving;
+            halfTime(released, released_t, button, leaving);
         }
     }
 
@@ -47,15 +69,7 @@ void startGame(Game * game, Scene scene)
     scene.Use();
     game->update();
 
-    if (game->isDead()) STATE = in_end_game;
-}
-
-void startEndGame(Game * game, Scene scene, GLFWwindow * window)
-{
-    scene.Use();
-    game->Draw();
-
-    if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
+    if (game->isDead()) 
     {
         game->reset();
         STATE = in_menu;
@@ -79,6 +93,10 @@ int main()
 
     Scene scene;
 
+    Button * button = new Button;
+    bool released = false;
+    double released_t = glfwGetTime();
+
     //main while loop
     while (!glfwWindowShouldClose(window))
     {
@@ -94,15 +112,9 @@ int main()
                 break;
             }
 
-            case in_end_game :
-            {
-                startEndGame(game, scene, window);
-                break;
-            }
-
             case in_menu :
             {
-                startMenu(menu, game, scene);
+                startMenu(menu, game, scene, released, released_t, button);
                 break;
             }
 
