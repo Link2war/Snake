@@ -1,6 +1,6 @@
 #pragma once
 
-#include <BBOP/Graphics.h>
+#include "../Bbop-Library/include/BBOP/Graphics.h"
 #include <GLFW/glfw3.h>
 #include <GL/glew.h>
 #include <string>

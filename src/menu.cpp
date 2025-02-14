@@ -184,12 +184,12 @@ void Menu::setButton(Button *& button)
     if (button->on)
     {
         button->on = false;
-        texture_path = "sprite/iu/button/" + button->name + "_0.png";
+        texture_path = "sprite/iu/button/" + button->name + "/0.png";
     }
     else
     {
         button->on = true;
-        texture_path = "sprite/iu/button/" + button->name + "_1.png";
+        texture_path = "sprite/iu/button/" + button->name + "/1.png";
     }
     button->sprite->setTexture(texture_path.c_str());
 }

@@ -1,6 +1,6 @@
 #include "include/game.h"
 
-#include <BBOP/Graphics.h>
+#include "Bbop-Library/include/BBOP/Graphics.h"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
@@ -22,18 +22,16 @@ void halfTime(bool &released, double &released_t, Button *&button, enum main_sta
     {
         released_t = glfwGetTime();
         released = true; 
-        std::string path = "sprite/iu/button/" + button->name + "_2.png";
+        std::string path = "sprite/iu/button/" + button->name + "/2.png";
         button->sprite->setTexture(path.c_str());
     }
     else if (glfwGetTime() - released_t > 0.3) 
     {
-        released = false;
         std::string path;
-
-        if (button->name == "start") path = "sprite/iu/button/" + button->name + "_1.png";
-        else path = "sprite/iu/button/" + button->name + "_0.png";
+        path = "sprite/iu/button/" + button->name + "/1.png";
         button->sprite->setTexture(path.c_str());
 
+        released = false;
         STATE = etat;
     }
 }
@@ -74,6 +72,11 @@ void startGame(Game * game, Scene scene)
         game->reset();
         STATE = in_menu;
     }
+}
+
+void startSettings(GLFWwindow * window)
+{
+    if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) STATE = in_menu;
 }
 
 
@@ -120,6 +123,7 @@ int main()
 
             case in_settings :
             {
+                startSettings(window);
                 break;
             }
 

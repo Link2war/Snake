@@ -2,8 +2,7 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <BBOP/Graphics.h>
-
+#include "../Bbop-Library/include/BBOP/Graphics.h"
 
 class Block
 {

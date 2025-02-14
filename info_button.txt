@@ -1,4 +1,4 @@
-start true sprite/iu/button/start_1.png 180 185
-settings false sprite/iu/button/settings_0.png 180 320
-exit false sprite/iu/button/exit_0.png 180 455
+start true sprite/iu/button/start/1.png 180 185
+settings false sprite/iu/button/settings/0.png 180 320
+exit false sprite/iu/button/exit/0.png 180 455
 -
