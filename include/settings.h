@@ -7,6 +7,7 @@ class Settings
 {
     private :
         Sprite * background;
+        Sprite * Retour;
 
     public :
         Settings();

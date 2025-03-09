@@ -10,27 +10,25 @@ class Block
 {
     private :
         Sprite * sprite; // sprite du block
-        float vitesse; // vitesse du block
+        float velocity; // vitesse du block
         std::string direction; // direction du block
         
-        Vector2f depart; // position initiale quand le block est sur une case
-        Vector2f position; // position actuelle du block
-        Vector2f arrivee; // position prévue de la prochaine case
+        Vector2f initPos; // position initiale quand le block est sur une case
+        Vector2f currentPos; // position actuelle du block
+        Vector2f destPos; // position prévue de la prochaine case
 
-        Block* suivant; // pointeur vers le block suivant (en direction de la queue)
-        Block* precedent; // pointeur vers le block précédent (en direction de la tête)
-
-        int frame; // frame animation du sprite
+        Block* next; // pointeur vers le block suivant (en direction de la queue)
+        Block* previous; // pointeur vers le block précédent (en direction de la tête)
 
     public :
 
-        friend class Serpent;
+        friend class Snake;
 
         /* @brief constructeur de la classe Block
         @param texture chemin du sprite
         @param x abscisse du block
         @param y ordonnée du block
-        @note ajoute un block queue pour avoir un serpent avec une tête et un corps */
+        @note ajoute un block queue pour avoir un Snake avec une tête et un corps */
         Block(Texture texture, float x, float y);
 
         /* @brief destructeur de la classe Block
@@ -42,7 +40,7 @@ class Block
 
         /* @brief Retourne true si le block est sur une case sinon retourne false
         @note Utilisé pour les changements de direction */
-        bool onCase(); 
+        bool onCell(); 
 
         /* @brief Déplacement du block vers le haut
         @note Met à jour la position 
@@ -70,7 +68,7 @@ class Block
         /* @brief met à jour la direction du block
         @param direction input de direction
         @note quand le block est sur une case :
-        @note - Si le block correspond au block de la tête du serpent : 
+        @note - Si le block correspond au block de la tête du Snake : 
         @note La direction dépend de la position de départ et d'arrivée du block.
         @note - Sinon : 
         @note La direction dépend de la position actuelle du block et de la position de départ du block tête. */
@@ -78,14 +76,14 @@ class Block
 
         /* @brief Change la case de depart du block
         @note La position de départ du block = position actuelle du block */
-        void setDepart();
+        void setInitPos();
 
         /* @brief Change la case d'arrivée du block
         @note La position d'arrivée du block = la position de départ du block tête */
-        void setArrivee();
+        void setDestPos();
 
         /* @brief Modifie l'image du sprite
-        @note Utilisé lorsque le serpent mange un block */
+        @note Utilisé lorsque le Snake mange un block */
         void setSprite(Texture texure);
 
         /* @brief Retourne le sprite du block
@@ -93,48 +91,47 @@ class Block
         Sprite * getSprite(); 
 
         // @brief Retourne la position actuelle du block (case actuelle / entre deux cases)
-        Vector2f getPosition(); 
-
-        /* @brief Retourne le block suivant
-        @note Utilisé dans la classe Game pour parcourir le serpent */
-        Block * getSuivant(); 
+        Vector2f getCurrentPos(); 
 
         /* retourne la position (case) d'arrivée du block
-        @note Utilisé dans la classe Game pour parcourir le serpent */
-        Vector2f getArrivee();
-        
+        @note Utilisé dans la classe Game pour parcourir le Snake */
+        Vector2f getDestPos();
+
+        /* @brief Retourne le block suivant
+        @note Utilisé dans la classe Game pour parcourir le Snake */
+        Block * getNext();         
 };
 
-class Serpent
+class Snake
 {
     private :
-        Vector2f position_defaut; // position du serpent en début de partie
-        Block* tete; // Pointeur vers le block de tête du serpent (premier block du serpent)
-        Block* queue; // Pointeur vers le block queue du serpent (dernier block du serpent)
+        Vector2f defaultPos; // position du Snake en début de partie
+        Block* head; // Pointeur vers le block de tête du Snake (premier block du Snake)
+        Block* tail; // Pointeur vers le block queue du Snake (dernier block du Snake)
 
     public :
-        /* @brief Constructeur de la classe Serpent
-        @note génère un serpent avec trois blocks
+        /* @brief Constructeur de la classe Snake
+        @note génère un Snake avec trois blocks
         @note - Un block pour la tête
         @note - Un block pour le corps
         @note - Un block pour la queue */
-        Serpent(float x, float y);
+        Snake(float x, float y);
 
-        /* @brief Destructeur de la classe Serpent
+        /* @brief Destructeur de la classe Snake
         @note Désalloue tous les pointeurs de type Block */
-        ~Serpent();
+        ~Snake();
 
-        /* @brief Mise à jour de tous les blocks du serpent
-        @param direction Input de direction transmis à la tête du serpent
+        /* @brief Mise à jour de tous les blocks du Snake
+        @param direction Input de direction transmis à la tête du Snake
         @note Mise à jour du block tête puis des autres blocks
         @note - Mise à jour block tête : direction, départ, arrviée, position
         @note -  Mise à jour des autres blocks : départ, arrivée, direction, position */
         void update(std::string direction);
 
-        /* @brief Ajoute un nouveau block au serpent
-        @note Si le serpent à déja une queue :
+        /* @brief Ajoute un nouveau block au Snake
+        @note Si le Snake à déja une queue :
         @note - Modifie le sprite du block queue
-        @note - Ajoute un nouveau block à la queue du serpent avec la position de départ de l'ancien block queue
+        @note - Ajoute un nouveau block à la queue du Snake avec la position de départ de l'ancien block queue
         @note - Le pointeur du block queue devient celui du nouveau block queue */
         void addBlock();
 
@@ -143,22 +140,22 @@ class Serpent
         @param offsetY Offset y de l'écran de jeu */
         bool OutOfBounds(float offsetX, float offsetY);
 
-        // @brief Vérifie si le serpent s'est mordue la queue
+        // @brief Vérifie si le Snake s'est mordue la queue
         bool Hit();
 
-        /* @brief Retourne le pointeur du block de tête du serpent 
+        /* @brief Retourne le pointeur du block de tête du Snake 
         @note Récupéré par le Game */
-        Block* getTete();
+        Block* getHead();
 
-        /* @brief Change la direction du serpent (tête)
-        @param direction input de direction à appliquer au serpent (tête) */
+        /* @brief Change la direction du Snake (tête)
+        @param direction input de direction à appliquer au Snake (tête) */
         void setDirection(std::string direction);
 
-        /* @brief Change la position d'arrivée de la tête du serpent 
-        @note Change la position d'arrivée selon la direction de la tête du serpent */
-        void setArrivee(); 
+        /* @brief Change la position d'arrivée de la tête du Snake 
+        @note Change la position d'arrivée selon la direction de la tête du Snake */
+        void setDestPos(); 
 
-        /* @brief Retourne la direction du serpent
+        /* @brief Retourne la direction du Snake
         @note utilisé par la gestion d'input de déplacement dans le Game */
         std::string getDirection();
 };

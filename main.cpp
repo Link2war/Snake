@@ -25,9 +25,9 @@ void startMenu(Menu *menu, Game* game)
 
         if (end_half_time) // changement de l'état principal
         {
-            if (menu->getButton()->name == "start") STATE = in_game;
-            else if(menu->getButton()->name == "settings") STATE = in_settings;
-            else if(menu->getButton()->name == "exit") STATE = leaving;
+            if (menu->getButtonName() == "start") STATE = in_game;
+            else if(menu->getButtonName() == "settings") STATE = in_settings;
+            else if(menu->getButtonName() == "exit") STATE = leaving;
         }
     }
     

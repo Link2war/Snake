@@ -1,7 +1,7 @@
 #pragma once
 
 #include <BBOP/Graphics.h>
-#include "serpent.h"
+#include "snake.h"
 #include "menu.h"
 
 #include <GL/glew.h>
@@ -18,16 +18,14 @@ class Game
         GLFWwindow * window; // Fenêtre glfw
         Scene scene; // Scène de jeu
 
+        float offsetX; // Offset de largeur
+        float offsetY; // Offset de hauteur        
+        
         Sprite * background; // Pointeur du sprite d'arrière plan
         Sprite * ground; // sol du jeu
-
-        float offsetX; // Offset de largeur
-        float offsetY; // Offset de hauteur
-        
-        Serpent * serpent; // Pointeur du serpent utilisé par le joueur
         Sprite * fruit; // Pointeur du sprite de l'objet à collecter
 
-        
+        Snake * snake; // Pointeur du serpent utilisé par le joueur
 
         bool is_dead; // État de la partie
         bool start; // lancement de la partie

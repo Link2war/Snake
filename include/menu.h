@@ -70,7 +70,7 @@ class Menu
         @return menu_input : input sélectionné selon l'action lié
         @note Renvoie l'input (un entier) correspondant à l'action choisie
         */
-        menu_input naviguation();
+        menu_input navigation();
 
         /* @brief Mise à jour du Menu
         @return current_button : bouton sur lequel le joueur se trouve
@@ -88,7 +88,9 @@ class Menu
         */
         void setButton(Button *& button);
 
-        Button * getButton();
+        /* @brief retourne le nom du Button sélectionné
+        */
+        std::string getButtonName();
 
         /* @brief Laps de temps après avoir appuyé sur un bouton
         @return end_half_time : retourne true si le halftime est terminé
