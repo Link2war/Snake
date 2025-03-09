@@ -1,9 +1,9 @@
-#include "include/game.h"
-
-#include "Bbop-Library/include/BBOP/Graphics.h"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include <BBOP/Graphics.h>
+
+#include "include/game.h"
 
 enum main_state 
 {
@@ -12,60 +12,32 @@ enum main_state
     in_settings=2,
     leaving=3
 };
-
 main_state STATE = in_menu;
 
-// laps de temps après avoir appuyé sur un bouton
-void halfTime(bool &released, double &released_t, Button *&button, enum main_state etat)
+void startMenu(Menu *menu, Game* game)
 {
-    if (!released)
-    {
-        released_t = glfwGetTime();
-        released = true; 
-        std::string path = "sprite/iu/button/" + button->name + "/2.png";
-        button->sprite->setTexture(path.c_str());
-    }
-    else if (glfwGetTime() - released_t > 0.3) 
-    {
-        std::string path;
-        path = "sprite/iu/button/" + button->name + "/1.png";
-        button->sprite->setTexture(path.c_str());
-
-        released = false;
-        STATE = etat;
-    }
-}
-
-void startMenu(Menu *menu, Game* game, Scene scene, bool &released, double &released_t, Button *&button)
-{
-    scene.Use();
     game->Draw();
+    menu->update();
 
-    if (released == false) button = menu->update();
-
-    if(button != nullptr)
+    if (menu->quitMenu())
     {
-        if (button->name == "start")
+        bool end_half_time = menu->halfTime(); // mi-temps avant le lancement de la page
+
+        if (end_half_time) // changement de l'état principal
         {
-            halfTime(released, released_t, button, in_game);
-        }
-        else if(button->name == "settings")
-        {
-            halfTime(released, released_t, button, in_settings);
-        }
-        else if(button->name == "exit")
-        {
-            halfTime(released, released_t, button, leaving);
+            if (menu->getButton()->name == "start") STATE = in_game;
+            else if(menu->getButton()->name == "settings") STATE = in_settings;
+            else if(menu->getButton()->name == "exit") STATE = leaving;
         }
     }
-
-    menu->Draw(scene);
+    
+    menu->Draw();
 }
 
-void startGame(Game * game, Scene scene)
+void startGame(Game * game)
 {
-    scene.Use();
     game->update();
+    game->Draw();
 
     if (game->isDead()) 
     {
@@ -89,35 +61,27 @@ int main()
     bbopInit(1280,720,"Snake",window);
     glfwMaximizeWindow(window);
     
-
     std::cout << "Initialisation de la Partie" << std::endl;
     Game * game = new Game(window);
     Menu * menu = new Menu(window);
-
-    Scene scene;
-
-    Button * button = new Button;
-    bool released = false;
-    double released_t = glfwGetTime();
 
     //main while loop
     while (!glfwWindowShouldClose(window))
     {
         // clear de la fenêtre en noire
         bbopCleanWindow(window,Vector3i(0,0,0),1.0f);
-        
 
         switch (STATE)
         {
             case in_game :
             {
-                startGame(game, scene);
+                startGame(game);
                 break;
             }
 
             case in_menu :
-            {
-                startMenu(menu, game, scene, released, released_t, button);
+            { 
+                startMenu(menu, game);
                 break;
             }
 
@@ -147,10 +111,10 @@ int main()
         glfwPollEvents();
     }
 
-    delete game;
+    if (game) delete game;
     game = nullptr;
 
-    delete menu;
+    if (menu) delete menu;
     menu = nullptr;
 
     // destruction de la fen^tre et fin de glfw

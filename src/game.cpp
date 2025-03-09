@@ -32,9 +32,8 @@ Game::~Game()
 
 void Game::update()
 {
-    scene.Use();
-
     getDirection();
+
     if (direction != "none")
     {
         checkFruit();
@@ -45,13 +44,13 @@ void Game::update()
             is_dead = true;
         }
     }
-
-    Draw();
 }
 
 
 void Game::Draw()
 {
+    scene.Use();
+    
     scene.Draw(*background);
     scene.Draw(*ground);
 
@@ -63,6 +62,7 @@ void Game::Draw()
     }
 
     scene.Draw(*fruit);
+    scene.render();
 }
 
 void Game::reset()

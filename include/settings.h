@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Bbop-Library/include/BBOP/Graphics.h"
+#include <BBOP/Graphics.h>
 
 
 class Settings

@@ -1,29 +1,18 @@
 CC = g++
-CFLAGS = -std=c++11 -Wall -I/usr/include/freetype2 -g
-LIBS = -L./Bbop-Library -lbbop -lglfw3 -lGLEW -lGL -lfreetype -lLDtkLoader -lIrrKlang
+CFLAGS = -std=c++11 -Wall -I/usr/include/freetype2
+LIBS = -L/usr/local/lib/ -lbbop -lglfw3 -lGLEW -lGL -lfreetype  -lLDtkLoader
 
-SRCS = main.cpp src/game.cpp src/serpent.cpp src/menu.cpp
+SRCS = main.cpp src/game.cpp src/menu.cpp src/serpent.cpp src/settings.cpp
 
-OBJS = $(SRCS:.cpp=.o)
+OBJS = $(SRCSM:.cpp=.o) $(SRCS:.cpp=.o)
 
-GREEN = \033[0;32m
-CYAN = \033[0;36m
-PURPLE = \033[0;35m
-NC = \033[0m
+all: final
 
-all: final.exe
-
-final.exe: $(OBJS)
-	@(cd Bbop-Library && make -j && make lib)
-	@echo -e "$(PURPLE)Linking compiled files $(NC)"
-	@$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
-	@echo -e "$(GREEN)Linking done ! $(NC)"
+final: $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
 
 %.o: %.cpp
-	@echo -e "$(GREEN)Compiling $(CYAN)[$@] $(NC)"
-	@$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	@echo -e "$(PURPLE)Deleting all objects files and final$(NC)"
-	@rm -f final.exe $(OBJS)
-	@(cd Bbop-Library && make clean)
+	rm -f final $(OBJS)

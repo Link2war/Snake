@@ -1,15 +1,16 @@
 #pragma once
 
+#include <BBOP/Graphics.h>
+#include "serpent.h"
+#include "menu.h"
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include "../Bbop-Library/include/BBOP/Graphics.h"
-
 #include <vector>
 #include <string>
 #include <random>
 
-#include "serpent.h"
-#include "menu.h"
+
 
 class Game
 {

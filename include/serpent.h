@@ -1,8 +1,10 @@
 #pragma once
 
+#include <BBOP/Graphics.h>
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include "../Bbop-Library/include/BBOP/Graphics.h"
+
 
 class Block
 {

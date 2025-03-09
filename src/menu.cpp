@@ -1,103 +1,81 @@
 #include "../include/menu.h"
 #include <fstream>
 
+void initButton(Button *& button, const char * name, bool on, Vector2f position, Button * next, Button * previous)
+{
+    std::string texture_path;
+
+    button->name = name;
+    button->on = on;
+    button->released = false;
+    button->released_t = glfwGetTime();
+    
+    if (on) texture_path = "sprite/iu/button/" + button->name + "/1.png";
+    else texture_path = "sprite/iu/button/" + button->name + "/0.png";
+    button->sprite = new Sprite(texture_path.c_str());
+    button->sprite->setPosition(position);
+
+    button->next = next;
+    button->previous = previous;
+}
+
+
 Menu::Menu(GLFWwindow * _window) :
     window(_window),
     background(new Sprite("sprite/iu/menu.png")),
+    current_button(nullptr),
     released(true),
     released_t(glfwGetTime()),
-    current_button(nullptr)
+    quit(false)
 {
-    std::ifstream filename("info_button.txt");
-    std::string info;
-
-    if (!filename)
-    {
-        std::cout << "Erreur lors de l'ouverture du fichier " << std::endl;
-        exit(1);
-    }
-    else
-    {
-        filename >> info;
-
-        while (info != "-")
-        {
-            Button * button = new Button; // nouveau bouton
-
-            button->name = info; // nom
-
-            filename >> info; // booléen on
-            if (info == "true") button->on = true;
-            else button->on = false;
-
-            filename >> info; // chemin du sprite
-            button->sprite = new Sprite(info.c_str());
-
-            filename >> info; // position x
-            float x = stoi(info);
-
-            filename >> info; // position y
-            float y = stoi(info);
-            button->sprite->setPosition(x, y);
-
-            filename >> info; // ligne suivante
-
-            button->next = nullptr;
-            button->previous = nullptr;
-
-
-            // liste chaînée
-            if (current_button == nullptr) current_button = button;
-            else
-            {
-                Button * temp = current_button;
-                while (temp->next != nullptr)
-                {
-                    temp = temp->next;
-                }
-                temp->next = button;
-                button->previous = temp;
-            }
-        }   
-    }
-    filename.close();
-
+    initMenuButtons();
     std::cout << "Menu initialisé" << std::endl;
-
-    // pointeur du dernier bouton vers le premier et vice versa
-    Button * temp = current_button;
-    while (temp->next != nullptr) temp = temp->next;
-    temp->next = current_button;
-    current_button->previous = temp; 
-    temp = current_button;
 }
 
-void Menu::Draw(Scene scene)
+void Menu::initMenuButtons()
 {
+    Button * button_start = new Button;
+    Button * button_settings = new Button;
+    Button * button_exit = new Button;
+
+    initButton(button_start, "start", true, Vector2f(180, 185), button_settings, button_exit);
+    initButton(button_settings, "settings", false, Vector2f(180, 185+135), button_exit, button_start);
+    initButton(button_exit, "exit", false, Vector2f(180, 185+135*2), button_start, button_settings);
+
+    current_button = button_start;
+}
+
+void Menu::Draw()
+{
+    scene.Use();
+
     scene.Draw(*background);
     
     Button * start = current_button;
     Button * temp = current_button;
 
+    // fait une boucle entière (temp est déjà égal à start)
     do
     {
         scene.Draw(*temp->sprite);
         temp = temp->next; 
     }
     while (temp != start);
+
+    scene.render();
 }
 
 menu_input Menu::naviguation()
 {
-    if ((glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS))
+    if ((glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) || (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS))
     {
         return menu_up;
     }
-    if ((glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS))
+    if ((glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) || (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS))
     {
         return menu_down;
     }
-    if ((glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS))
+    if ((glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) || (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS))
     {
         return menu_select;
     }
@@ -119,7 +97,7 @@ Menu::~Menu()
     } 
     while (current_button != start); // Continue tant qu'on n'a pas bouclé
 
-    current_button = nullptr; // Assure-toi que le pointeur est nul après la destruction
+    current_button = nullptr; // Assure que le pointeur est nul après la destruction
 }
 
 Button *  Menu::update()
@@ -181,15 +159,52 @@ Button *  Menu::update()
 void Menu::setButton(Button *& button)
 {
     std::string texture_path;
-    if (button->on)
-    {
-        button->on = false;
-        texture_path = "sprite/iu/button/" + button->name + "/0.png";
-    }
-    else
-    {
-        button->on = true;
-        texture_path = "sprite/iu/button/" + button->name + "/1.png";
-    }
+    if (button->on) texture_path = "sprite/iu/button/" + button->name + "/0.png";
+    else texture_path = "sprite/iu/button/" + button->name + "/1.png";
     button->sprite->setTexture(texture_path.c_str());
+
+    button->on = !button->on;
 }
+
+Button * Menu::getButton()
+{
+    return current_button;
+}
+
+bool Menu::halfTime()
+{
+    if (!released)
+    {
+        current_button->released_t = glfwGetTime();
+        current_button->released = true;
+
+        std::string path = "sprite/iu/button/" + current_button->name + "/2.png";
+        current_button->sprite->setTexture(path.c_str());
+        
+        return false;
+    }
+    else if (glfwGetTime() - current_button->released_t > 0.3)
+    {
+        std::string path = "sprite/iu/button/" + current_button->name + "/1.png";
+        current_button->sprite->setTexture(path.c_str());
+
+        current_button->released = false;
+        quit = false;
+
+        return true;
+    }
+    return false;
+}
+
+bool Menu::quitMenu()
+{
+    if (naviguation() == 2) 
+    {
+        quit = true;
+        return true;
+    }
+    else if (quit) return true;
+
+    return false;
+}
+

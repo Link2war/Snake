@@ -1,6 +1,7 @@
 #pragma once
 
-#include "../Bbop-Library/include/BBOP/Graphics.h"
+#include <BBOP/Graphics.h>
+
 #include <GLFW/glfw3.h>
 #include <GL/glew.h>
 #include <string>
@@ -15,24 +16,37 @@ enum menu_input
 
 struct Button
 {
-    Sprite * sprite;
     std::string name;
     bool on;
+    bool released; // si le bouton a été sélectionné
+    double released_t; // timing depuis que le bouton a été selectionné
 
+    Sprite * sprite;
     Button * next;
     Button * previous;
 };
+
+/* @brief constructeur d'un Button
+@note Prend un Button en argument, lui attribut les autres valeurs mises en arguments
+*/
+void initButton(Button *& button, const char * name, bool on, Vector2f position, Button * next, Button * previous);
+
 
 class Menu
 {
     private :
         GLFWwindow * window; // Fenêtre glfw
-        Sprite * background; // Arrière plan du menu
+        Scene scene; // Scène du menu
 
+        Sprite * background; // Arrière plan du menu
+        Button * current_button; // pointeur sur le bouton survolé
+
+        // naviguation du menu
         bool released; // si la touche à été relaché avant de prendre un autre input
         double released_t; // timing depuis le dernière appuis
+        bool quit; // si le joueur a séléctionné un Button
 
-        Button * current_button; // pointeur sur le bouton sur où se trouve le joueur
+        
 
     public :
         /* @brief Constructeur de la classe Menu
@@ -50,7 +64,7 @@ class Menu
         /* @brief Affichage des différents Sprite dans la scène de jeu
         @param scene Attribut Scene de la classe Game
         */
-        void Draw(Scene scene);
+        void Draw();
 
         /* @brief Gère la naviguation dans le menu
         @return menu_input : input sélectionné selon l'action lié
@@ -64,8 +78,25 @@ class Menu
         */
         Button * update();
 
+        /* @brief initialise tous les boutons du menu
+        @note utilise initButton pour générer chaque button
+        */
+        void initMenuButtons();
+
         /* @brief Modifie le bouton
         @note Change la texture du sprite et l'état du bouton selon son état actuel
         */
         void setButton(Button *& button);
+
+        Button * getButton();
+
+        /* @brief Laps de temps après avoir appuyé sur un bouton
+        @return end_half_time : retourne true si le halftime est terminé
+        */
+        bool halfTime();
+
+        /* @brief si le joueur doit quitter le menu
+        @note si un bouton est sélectionné ou si le bool quit est true
+        */
+        bool quitMenu();
 };
