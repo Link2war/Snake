@@ -4,11 +4,13 @@
 
 Menu::Menu(GLFWwindow * _window) :
     window(_window),
-    background(new Sprite("sprite/iu/menu.png")),
-    current_button(nullptr),
+    board(new Sprite("sprite/iu/board.png")),
+    currentButton(nullptr),
     released(true),
     released_t(glfwGetTime()),
-    quit(false)
+    quit(false),
+    enter(false),
+    speedTransition(8)
 {
     initMenuButtons();
     std::cout << "Menu initialisé" << std::endl;
@@ -18,10 +20,10 @@ void Menu::Draw()
 {
     scene.Use();
 
-    scene.Draw(*background);
+    scene.Draw(*board);
     
-    Button * start = current_button;
-    Button * temp = current_button;
+    Button * start = currentButton;
+    Button * temp = currentButton;
 
     // fait une boucle entière (temp est déjà égal à start)
     do
@@ -36,6 +38,10 @@ void Menu::Draw()
 
 menu_input Menu::navigation()
 {
+    if (quit || enter)
+    {
+        return menu_null;
+    }
     if ((glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) || (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS))
     {
         return menu_up;
@@ -53,20 +59,20 @@ menu_input Menu::navigation()
 
 Menu::~Menu()
 {
-    if (!current_button) return; // Si la liste est vide, rien à faire
+    if (!currentButton) return; // Si la liste est vide, rien à faire
 
-    Button* start = current_button;
+    Button* start = currentButton;
     Button* temp = nullptr;
 
     do 
     {
-        temp = current_button->next; // Sauvegarde le prochain élément
-        delete current_button; // Supprime le bouton actuel
-        current_button = temp; // Passe au suivant
+        temp = currentButton->next; // Sauvegarde le prochain élément
+        delete currentButton; // Supprime le bouton actuel
+        currentButton = temp; // Passe au suivant
     } 
-    while (current_button != start); // Continue tant qu'on n'a pas bouclé
+    while (currentButton != start); // Continue tant qu'on n'a pas bouclé
 
-    current_button = nullptr; // Assure que le pointeur est nul après la destruction
+    currentButton = nullptr; // Assure que le pointeur est nul après la destruction
 }
 
 Button *  Menu::update()
@@ -85,9 +91,9 @@ Button *  Menu::update()
             case menu_up :
                 while (!activated)
                 {
-                    setButton(current_button);
-                    current_button = current_button->previous;
-                    setButton(current_button);
+                    setButton(currentButton);
+                    currentButton = currentButton->previous;
+                    setButton(currentButton);
 
                     activated = true;
                 }
@@ -98,9 +104,9 @@ Button *  Menu::update()
             case menu_down :
                 while (!activated)
                 {
-                    setButton(current_button);
-                    current_button = current_button->next;
-                    setButton(current_button);
+                    setButton(currentButton);
+                    currentButton = currentButton->next;
+                    setButton(currentButton);
 
                     activated = true;
                 }
@@ -112,7 +118,7 @@ Button *  Menu::update()
                 released = false; 
                 released_t = glfwGetTime();
 
-                return current_button;
+                return currentButton;
                 break;
 
             default :
@@ -131,11 +137,11 @@ void Menu::initMenuButtons()
     Button * button_settings = new Button;
     Button * button_exit = new Button;
 
-    initButton(button_start, "start", true, Vector2f(180, 185), button_settings, button_exit);
+    initButton(button_start, "play", true, Vector2f(180, 185), button_settings, button_exit);
     initButton(button_settings, "settings", false, Vector2f(180, 185+135), button_exit, button_start);
     initButton(button_exit, "exit", false, Vector2f(180, 185+135*2), button_start, button_settings);
 
-    current_button = button_start;
+    currentButton = button_start;
 }
 
 void Menu::setButton(Button *& button)
@@ -150,28 +156,25 @@ void Menu::setButton(Button *& button)
 
 std::string Menu::getButtonName()
 {
-    return current_button->name;
+    return currentButton->name;
 }
 
 bool Menu::halfTime()
 {
-    if (!released)
+    if (!currentButton->released)
     {
-        current_button->released_t = glfwGetTime();
-        current_button->released = true;
+        currentButton->released_t = glfwGetTime();
+        currentButton->released = true;
 
-        std::string path = "sprite/iu/button/" + current_button->name + "/2.png";
-        current_button->sprite->setTexture(path.c_str());
+        std::string path = "sprite/iu/button/" + currentButton->name + "/2.png";
+        currentButton->sprite->setTexture(path.c_str());
         
         return false;
     }
-    else if (glfwGetTime() - current_button->released_t > 0.3)
+    else if (glfwGetTime() - currentButton->released_t > 0.3)
     {
-        std::string path = "sprite/iu/button/" + current_button->name + "/1.png";
-        current_button->sprite->setTexture(path.c_str());
-
-        current_button->released = false;
-        quit = false;
+        std::string path = "sprite/iu/button/" + currentButton->name + "/1.png";
+        currentButton->sprite->setTexture(path.c_str());
 
         return true;
     }
@@ -190,21 +193,67 @@ bool Menu::quitMenu()
     return false;
 }
 
-
-void initButton(Button *& button, const char * name, bool on, Vector2f position, Button * next, Button * previous)
+bool Menu::enterMenu()
 {
-    std::string texture_path;
+    if (board->getPosition().y < 0) 
+    {
+        enter = true;
+        return true;
+    }
+    else return false;
+}
 
-    button->name = name;
-    button->on = on;
-    button->released = false;
-    button->released_t = glfwGetTime();
-    
-    if (on) texture_path = "sprite/iu/button/" + button->name + "/1.png";
-    else texture_path = "sprite/iu/button/" + button->name + "/0.png";
-    button->sprite = new Sprite(texture_path.c_str());
-    button->sprite->setPosition(position);
+bool Menu::transitionOut()
+{
+    Vector2f boardPos = board->getPosition();
+    if (boardPos.y > - board->getSize().y) 
+    {
+        // déplace tous les éléments de la scène
+        board->setPosition(boardPos.x, boardPos.y - speedTransition);
 
-    button->next = next;
-    button->previous = previous;
+        Button * start = currentButton;
+        Button * temp = currentButton;
+        do
+        {
+            Vector2f buttonPos = temp->sprite->getPosition();
+            temp->sprite->setPosition(buttonPos.x, buttonPos.y - speedTransition);
+            temp = temp->next; 
+        }
+        while (temp != start);
+
+        return false; // état de la transition
+    }
+    else
+    {
+        // reset
+        currentButton->released = false;
+        quit = false;
+
+        return true; // état de la transition (terminé)
+    }
+}
+
+bool Menu::transitionIn()
+{
+    Vector2f boardPos = board->getPosition();
+    board->setPosition(boardPos.x, boardPos.y + speedTransition);
+
+    Button * start = currentButton;
+    Button * temp = currentButton;
+    do
+    {
+        Vector2f buttonPos = temp->sprite->getPosition();
+        temp->sprite->setPosition(buttonPos.x, buttonPos.y + speedTransition);
+        temp = temp->next; 
+    }
+    while (temp != start);
+
+    // état de la transition
+    if (board->getPosition().y < 0) return false;
+    else 
+    {
+        enter = false;
+        return true;
+    }
+
 }

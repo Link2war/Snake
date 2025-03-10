@@ -1,10 +1,11 @@
 #pragma once
 
 #include <BBOP/Graphics.h>
-
 #include <GLFW/glfw3.h>
 #include <GL/glew.h>
 #include <string>
+
+#include "iu.h"
 
 enum menu_input
 {
@@ -14,38 +15,23 @@ enum menu_input
     menu_null = 3,
 };
 
-struct Button
-{
-    std::string name;
-    bool on;
-    bool released; // si le bouton a été sélectionné
-    double released_t; // timing depuis que le bouton a été selectionné
-
-    Sprite * sprite;
-    Button * next;
-    Button * previous;
-};
-
-/* @brief constructeur d'un Button
-@note Prend un Button en argument, lui attribut les autres valeurs mises en arguments
-*/
-void initButton(Button *& button, const char * name, bool on, Vector2f position, Button * next, Button * previous);
-
-
 class Menu
 {
     private :
         GLFWwindow * window; // Fenêtre glfw
         Scene scene; // Scène du menu
 
-        Sprite * background; // Arrière plan du menu
-        Button * current_button; // pointeur sur le bouton survolé
+        Sprite * board; // panneau du menu
+        Button * currentButton; // pointeur sur le bouton survolé ou sélectionné
 
         // naviguation du menu
         bool released; // si la touche à été relaché avant de prendre un autre input
         double released_t; // timing depuis le dernière appuis
-        bool quit; // si le joueur a séléctionné un Button
 
+        // sortie/entrer du menu
+        bool quit; // si le joueur a séléctionné un Button
+        bool enter; // si le joueur retourne dans le menu
+        int speedTransition;
         
 
     public :
@@ -97,8 +83,25 @@ class Menu
         */
         bool halfTime();
 
-        /* @brief si le joueur doit quitter le menu
+        /* @brief si le joueur doit quitter le menu et que la transition n'est pas terminée
         @note si un bouton est sélectionné ou si le bool quit est true
         */
         bool quitMenu();
+
+        /* @brief si le joueur doit retourner dans le menu et que la transition n'est pas terminée
+        @note lancé quand la partie est terminé
+        */
+        bool enterMenu();
+
+        /* @brief transition du menu vers la game ou les settings
+        @return état de la transition
+        @note déplace tous les éléments de la scène vers le haut
+        */
+        bool transitionOut();
+
+        /* @brief transition de la game ou des settings vers le menu
+        @return état de la transition
+        @note déplace tous les éléments de la scène vers le bas
+        */
+        bool transitionIn();
 };

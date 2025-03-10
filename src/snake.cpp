@@ -134,7 +134,7 @@ Block * Block::getNext()
 
 
 Snake::Snake(float x, float y) : 
-    head(new Block(Texture("sprite/snake/defaut/0.png"), x, y)),
+    head(new Block(Texture("sprite/snake/0.png"), x, y)),
     tail(nullptr)
     
 {
@@ -175,7 +175,7 @@ void Snake::addBlock()
 {
     if (head->next == nullptr) // si le Snake n'est constitué que d'une tête
     {
-        Block * new_block = new Block("sprite/snake/defaut/1.png", head->initPos.x-32, head->initPos.y);
+        Block * new_block = new Block("sprite/snake/1.png", head->initPos.x-32, head->initPos.y);
         head->next = tail = new_block;
         tail->previous = head;
     }
@@ -186,14 +186,14 @@ void Snake::addBlock()
 
         if (head->direction == "none")
         {
-            new_block = new Block("sprite/snake/defaut/2.png", tail->initPos.x-32, tail->initPos.y);
+            new_block = new Block("sprite/snake/2.png", tail->initPos.x-32, tail->initPos.y);
         }
         else
         {
-            tail->setSprite(Texture("sprite/snake/defaut/1.png"));
-            new_block = new Block("sprite/snake/defaut/2.png", tail->initPos.x, tail->initPos.y);
+            tail->setSprite(Texture("sprite/snake/1.png"));
+            new_block = new Block("sprite/snake/2.png", tail->initPos.x, tail->initPos.y);
         }
-        tail->setSprite(Texture("sprite/snake/defaut/1.png"));
+        tail->setSprite(Texture("sprite/snake/1.png"));
 
         tail->next = new_block;
         new_block->previous = tail;

@@ -21,27 +21,36 @@ void startMenu(Menu *menu, Game* game)
 
     if (menu->quitMenu())
     {
-        bool end_half_time = menu->halfTime(); // mi-temps avant le lancement de la page
-
-        if (end_half_time) // changement de l'état principal
+        bool end_half_time = menu->halfTime(); // mi-temps pour l'effet d'appuis sur le Button
+        if (end_half_time) // lancement de la transition ou de l'exit
         {
-            if (menu->getButtonName() == "start") STATE = in_game;
-            else if(menu->getButtonName() == "settings") STATE = in_settings;
-            else if(menu->getButtonName() == "exit") STATE = leaving;
+            if(menu->getButtonName() == "exit") STATE = leaving;
+
+            bool end_transition = menu->transitionOut(); // transition entre deux pages
+            if (end_transition) // changement de page
+            {
+                if (menu->getButtonName() == "play") STATE = in_game;
+                else if(menu->getButtonName() == "settings") STATE = in_settings;
+            }
         }
+    }
+    else if (menu->enterMenu())
+    {
+        bool end_transition = menu->transitionIn(); // transition entre deux pages
+        if (end_transition) game->reset();
     }
     
     menu->Draw();
 }
 
-void startGame(Game * game)
+void startGame(Game * game, Menu * menu)
 {
     game->update();
     game->Draw();
 
     if (game->isDead()) 
     {
-        game->reset();
+        // le reset se fait après la transition
         STATE = in_menu;
     }
 }
@@ -75,7 +84,7 @@ int main()
         {
             case in_game :
             {
-                startGame(game);
+                startGame(game, menu);
                 break;
             }
 
