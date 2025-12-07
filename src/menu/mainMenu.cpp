@@ -1,0 +1,101 @@
+#include "../../include/menu/mainMenu.h"
+#include <fstream>
+
+
+MainMenu::MainMenu(ScoreData& sharedScoreData) :
+    scene(),
+    board(Sprite("assets/sprites/iu/board.png")),
+    state(MenuState::In),
+    scoreData(sharedScoreData),
+    scoreManager(&scoreData, 50, "assets/fonts/Ghrathe.ttf", Vector2f(600, 300), Vector2f(600, 350), Vector2f(600, 400)),
+    buttonManager(),
+    
+    speedTransition(8)
+{
+    std::cout << "MainMenu initialisé" << std::endl;
+}
+
+MainMenu::~MainMenu()
+{
+    std::cout << "MainMenu supprimé" << std::endl;
+}
+
+void MainMenu::Draw()
+{
+    scene.Use();
+    scene.Draw(board);
+    scene.Draw(scoreManager);
+    scene.Draw(buttonManager);
+    scene.render();
+}
+
+void MainMenu::updateScore()
+{
+    std::cout << scoreData.getTotalScore() <<std::endl;
+    scoreManager.refreshFromData();
+}
+
+void MainMenu::update(GLFWwindow * window)
+{
+    if (inputManager.getInput() != InputMenu::Select) {
+        inputManager.update(window);
+        buttonManager.update(inputManager.getInput());
+    }
+}
+
+void MainMenu::transitionOut()
+{
+    Vector2f boardPos = board.getPosition();
+
+    if (boardPos.y > - board.getSize().y) 
+    {
+        Vector2f velocity = Vector2f(0, speedTransition*-1);
+
+        // déplace tous les éléments de la scène
+        board.setPosition(boardPos.x + velocity.x, boardPos.y + velocity.y);
+        buttonManager.moveTo(velocity);
+        scoreManager.moveTo(velocity);
+    }
+    else {
+        state = MenuState::Out;
+        inputManager.reset();
+    }
+}
+
+void MainMenu::transitionIn()
+{
+    Vector2f boardPos = board.getPosition();
+
+    if (boardPos.y < 0) 
+    {
+        // déplace tous les éléments de la scène
+        Vector2f velocity = Vector2f(0, speedTransition);        
+        board.setPosition(boardPos.x + velocity.x, boardPos.y + velocity.y);
+        buttonManager.moveTo(velocity);
+        scoreManager.moveTo(velocity);
+    }
+    else {
+        state = MenuState::In;
+        updateScore();
+    }
+}
+
+bool MainMenu::transitionComplete()
+{
+    return state == MenuState::Out;
+}
+
+bool MainMenu::selectDelayOver()
+{
+    return buttonManager.selectTimestampOver();
+}
+
+bool MainMenu::buttonSelected(ButtonName buttonName)
+{
+    return buttonManager.buttonSelected(buttonName, inputManager.getInput());
+}
+
+MenuState MainMenu::getState()
+{
+    return state;
+}
