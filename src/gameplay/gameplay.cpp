@@ -114,10 +114,10 @@ void Gameplay::updateFruit()
         int random = distrib2(gen);
 
         if (random == 0) {
-            x = distrib16(gen) * 32 + offsetX;
+            x = distrib16(gen) * 32 + offsetX + fruit.getOrigin().x;
         } 
         else {
-            y = distrib16(gen) * 32 + offsetY;
+            y = distrib16(gen) * 32 + offsetY + fruit.getOrigin().y;
         }
     }
 
