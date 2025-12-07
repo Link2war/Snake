@@ -1,14 +1,14 @@
 #pragma once
 
 #include <BBOP/Graphics.h>
-#include "block.h"
+#include "snakeSegment.h"
 #include <deque>
 
 
 class Snake : public BbopDrawable
 {
     private :
-        std::deque<Block> body; // tableau de Block
+        std::deque<SnakeSegment> segments; // tableau de Block
         Vector2f initPosition; // position initiale du Snake (utilisé pour le reset)
 
     public :
@@ -68,13 +68,13 @@ class Snake : public BbopDrawable
          * @note - Met à jour les positions du Block de la tête du Snake
          * @note - Met à jour la direction puis les positions de chaque Block du reste du Snake
          */
-        void updateBlocksBody();
+        void updateBody();
 
         /**
          * @brief Ajout d'un Block au Snake
          * @note Le Sprite de la queue du Snake change
          */
-        void addBlock();
+        void addSegment();
 
         /**
          * @brief Vérifie si le joueur est en dehors des limites de l'écran de jeu

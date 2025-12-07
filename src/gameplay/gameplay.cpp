@@ -85,7 +85,7 @@ void Gameplay::updateSnake()
     snake.update(inputManager.getInput());
 
     if (snake.collideFruit(fruit.getPosition())) {
-        snake.addBlock();
+        snake.addSegment();
         score++;
         updateScore();
         updateFruit();

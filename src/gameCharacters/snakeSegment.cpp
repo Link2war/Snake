@@ -1,7 +1,7 @@
-#include "../../include/gameCharacters/block.h"
+#include "../../include/gameCharacters/snakeSegment.h"
 
 
-Block::Block(Texture texture, Vector2f position) :
+SnakeSegment::SnakeSegment(Texture texture, Vector2f position) :
     sprite(Sprite(texture)),
     speed(4),
     direction(Vector2i(0, 0)),
@@ -14,17 +14,17 @@ Block::Block(Texture texture, Vector2f position) :
     sprite.setOrigin(size.x/2, size.y/2);
 }
 
-Block::~Block()
+SnakeSegment::~SnakeSegment()
 {
-    // std::cout << "block du serpent supprimé" << std::endl;
+    // std::cout << "SnakeSegment du serpent supprimé" << std::endl;
 }
 
-void Block::Draw(GLint* renderUniform) const
+void SnakeSegment::Draw(GLint* renderUniform) const
 {
     sprite.Draw(renderUniform);
 }
 
-void Block::update()
+void SnakeSegment::update()
 {
     updateCurrentPosition();
     sprite.setPosition(currentPosition.x, currentPosition.y);
@@ -35,7 +35,7 @@ void Block::update()
     }    
 }
 
-void Block::updateRotation()
+void SnakeSegment::updateRotation()
 {
     if (direction.x == -1 && sprite.getRotation() != 3.14) {
         sprite.setRotation(3.14);
@@ -51,7 +51,7 @@ void Block::updateRotation()
     }
 }
 
-void Block::updateCurrentPosition()
+void SnakeSegment::updateCurrentPosition()
 {
     if (onCell()) {
         updateRotation();
@@ -61,48 +61,48 @@ void Block::updateCurrentPosition()
     currentPosition = Vector2f(currentPosition.x + velocity.x, currentPosition.y + velocity.y);
 }
 
-void Block::updateStartPosition()
+void SnakeSegment::updateStartPosition()
 {
     startPosition = currentPosition;
 }
 
-void Block::updateTargetPosition()
+void SnakeSegment::updateTargetPosition()
 {
     Vector2i nextCell = Vector2i(32*direction.x, 32*direction.y);
     targetPosition = Vector2f(targetPosition.x + nextCell.x, targetPosition.y + nextCell.y);
 }
 
-void Block::setDirection(Vector2i _direction)
+void SnakeSegment::setDirection(Vector2i _direction)
 {
     direction = _direction;
 }
 
-void Block::setSprite(Texture texture)
+void SnakeSegment::setSprite(Texture texture)
 {
     sprite.setTexture(texture);
 }
 
-bool Block::onCell() const
+bool SnakeSegment::onCell() const
 {
     return (int(currentPosition.x - 16) %32 == 0 && int(currentPosition.y + 8) %32 == 0);
 }
 
-Vector2f Block::getStartPosition() const
+Vector2f SnakeSegment::getStartPosition() const
 {
     return startPosition;
 }
 
-Vector2f Block::getCurrentPosition() const
+Vector2f SnakeSegment::getCurrentPosition() const
 {
     return currentPosition;
 }
 
-Vector2f Block::getTargetPosition() const
+Vector2f SnakeSegment::getTargetPosition() const
 {
     return targetPosition;
 }
 
-Vector2i Block::getDirection() const
+Vector2i SnakeSegment::getDirection() const
 {
     return direction;
 }

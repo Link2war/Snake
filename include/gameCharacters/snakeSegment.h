@@ -1,11 +1,21 @@
 #pragma once
 
 #include <BBOP/Graphics.h>
+#include <memory>
+
+enum class BodyPart
+{
+    Head,
+    Body,
+    Tail
+};
 
 
-class Block : public BbopDrawable
+class SnakeSegment : public BbopDrawable
 {
     private :
+        static std::unique_ptr<Texture> textures[3]; // textures[name]
+
         Sprite sprite; // sprite du block
         float speed; // vitesse du block
         Vector2i direction; // direction du block
@@ -20,13 +30,13 @@ class Block : public BbopDrawable
          * @param texture texture du sprite
          * @param position position initiale du snake
          */
-        Block(Texture texture, Vector2f position);
+        SnakeSegment(Texture texture, Vector2f position);
 
         /**
          * @brief Destructeur de la classe Block
          * @note Est virtual parce que la méthode Draw est surchargée
          */
-        virtual ~Block(); 
+        virtual ~SnakeSegment(); 
 
         /**
          * @brief Surcharge de la méthode Draw de BbopDrawable
