@@ -1,8 +1,10 @@
 #include "../../include/gameCharacters/snakeSegment.h"
 
 
-SnakeSegment::SnakeSegment(Texture texture, Vector2f position) :
-    sprite(Sprite(texture)),
+std::unique_ptr<Texture> SnakeSegment::textures[3];
+
+SnakeSegment::SnakeSegment(BodyPart bodyPart, Vector2f position) :
+    sprite(*textures[int(bodyPart)]),
     speed(4),
     direction(Vector2i(0, 0)),
     startPosition(position),
@@ -12,11 +14,22 @@ SnakeSegment::SnakeSegment(Texture texture, Vector2f position) :
     sprite.setPosition(currentPosition);
     Vector2f size = sprite.getSize();
     sprite.setOrigin(size.x/2, size.y/2);
+
+    std::cout << "SnakeSegment initialisé" << std::endl;
 }
 
 SnakeSegment::~SnakeSegment()
 {
     // std::cout << "SnakeSegment du serpent supprimé" << std::endl;
+}
+
+void SnakeSegment::initTextures()
+{
+    for (int n=0; n<3; n++)
+    {
+        std::string base = "assets/sprites/snake/";
+        textures[n] = std::make_unique<Texture>((base + std::to_string(n) + ".png").c_str());
+    }
 }
 
 void SnakeSegment::Draw(GLint* renderUniform) const
@@ -77,9 +90,9 @@ void SnakeSegment::setDirection(Vector2i _direction)
     direction = _direction;
 }
 
-void SnakeSegment::setSprite(Texture texture)
+void SnakeSegment::setTexture(BodyPart bodyPart)
 {
-    sprite.setTexture(texture);
+    sprite.setTexture(*textures[int(bodyPart)]);
 }
 
 bool SnakeSegment::onCell() const

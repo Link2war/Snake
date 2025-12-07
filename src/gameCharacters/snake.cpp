@@ -5,6 +5,7 @@ Snake::Snake(Vector2f position) :
     segments(),
     initPosition(position)
 {
+    SnakeSegment::initTextures();
     initBody();
     std::cout << "Snake initialisé" << std::endl;
 }
@@ -17,9 +18,9 @@ Snake::~Snake()
 void Snake::initBody()
 {
     // génère un SnakeSegment pour chaque partie du corps
-    segments.push_back(SnakeSegment("assets/sprites/snake/0.png", initPosition));
-    segments.push_back(SnakeSegment("assets/sprites/snake/1.png", Vector2f(initPosition.x-32, initPosition.y)));
-    segments.push_back(SnakeSegment("assets/sprites/snake/2.png", Vector2f(initPosition.x-64, initPosition.y)));
+    segments.push_back(SnakeSegment(BodyPart::Head, initPosition));
+    segments.push_back(SnakeSegment(BodyPart::Body, Vector2f(initPosition.x-32, initPosition.y)));
+    segments.push_back(SnakeSegment(BodyPart::Tail, Vector2f(initPosition.x-64, initPosition.y)));
 }
 
 void Snake::reset()
@@ -90,10 +91,10 @@ void Snake::updateBody()
 void Snake::addSegment()
 {
     // modifie le Sprite de queue en Sprite de corps
-    segments.back().setSprite("assets/sprites/snake/1.png");
+    segments.back().setTexture(BodyPart::Body);
 
     // Génère un SnakeSegment avec le Sprite de queue
-    SnakeSegment tail("assets/sprites/snake/2.png", segments.back().getStartPosition());
+    SnakeSegment tail(BodyPart::Tail, segments.back().getStartPosition());
     segments.push_back(tail);
 }
 
