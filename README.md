@@ -2,15 +2,8 @@
 2D Snake made with Bbop-Library
 
 GameLoop :
-- Modifier le framerate dans le main
-
-score Game-Menu :
-- ScoreData
-- ScoreUI
-- ScoreManagerMenu/Game
-
+- Modifier le framerate dans la GameLoop
 Menu:
-- transition In - Out
 - plan du menu background 4-8 gros nuages s'ouvrent et se ferment en même temps que la transition In et Out
 -> peut etre mis dans un TransitionManager
 
