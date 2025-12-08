@@ -55,7 +55,7 @@ class Snake : public BbopDrawable
          * @note - les différentes positions de chaque Block
          * @note - déplace chaque block
          */
-        void update(Vector2i inputDirection);
+        void update(Vector2i inputDirection, float deltaTime);
 
         /**
          * @brief Met à jour la direction du Block de tête
@@ -68,7 +68,7 @@ class Snake : public BbopDrawable
          * @note - Met à jour les positions du Block de la tête du Snake
          * @note - Met à jour la direction puis les positions de chaque Block du reste du Snake
          */
-        void updateBody();
+        void updateBody(float deltaTime);
 
         /**
          * @brief Ajout d'un Block au Snake

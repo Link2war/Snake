@@ -10,7 +10,7 @@ MainMenu::MainMenu(ScoreData& sharedScoreData) :
     scoreManager(&scoreData, 50, "assets/fonts/Ghrathe.ttf", Vector2f(600, 300), Vector2f(600, 350), Vector2f(600, 400)),
     buttonManager(),
     
-    speedTransition(8)
+    speedTransition(30)
 {
     std::cout << "MainMenu initialisé" << std::endl;
 }
@@ -35,15 +35,15 @@ void MainMenu::updateScore()
     scoreManager.refreshFromData();
 }
 
-void MainMenu::update(GLFWwindow * window)
+void MainMenu::update(GLFWwindow * window, float deltaTime)
 {
     if (inputManager.getInput() != InputMenu::Select) {
         inputManager.update(window);
-        buttonManager.update(inputManager.getInput());
+        buttonManager.update(inputManager.getInput(), deltaTime);
     }
 }
 
-void MainMenu::transitionOut()
+void MainMenu::transitionOut(float deltaTime)
 {
     Vector2f boardPos = board.getPosition();
 
@@ -52,27 +52,32 @@ void MainMenu::transitionOut()
         Vector2f velocity = Vector2f(0, speedTransition*-1);
 
         // déplace tous les éléments de la scène
-        board.setPosition(boardPos.x + velocity.x, boardPos.y + velocity.y);
-        buttonManager.moveTo(velocity);
-        scoreManager.moveTo(velocity);
+        board.setPosition(boardPos.x + velocity.x*deltaTime, boardPos.y + velocity.y*deltaTime);
+        buttonManager.moveTo(velocity, deltaTime);
+        scoreManager.moveTo(velocity, deltaTime);
+        speedTransition+=20;
     }
     else {
         state = MenuState::Out;
         inputManager.reset();
+        speedTransition=30;
     }
 }
 
-void MainMenu::transitionIn()
+void MainMenu::transitionIn(float deltaTime)
 {
     Vector2f boardPos = board.getPosition();
 
     if (boardPos.y < 0) 
     {
         // déplace tous les éléments de la scène
+        
         Vector2f velocity = Vector2f(0, speedTransition);        
-        board.setPosition(boardPos.x + velocity.x, boardPos.y + velocity.y);
-        buttonManager.moveTo(velocity);
-        scoreManager.moveTo(velocity);
+        board.setPosition(boardPos.x + velocity.x*deltaTime, boardPos.y + velocity.y*deltaTime);
+        buttonManager.moveTo(velocity, deltaTime);
+        scoreManager.moveTo(velocity, deltaTime);
+
+        speedTransition+=20;
     }
     else {
         state = MenuState::In;

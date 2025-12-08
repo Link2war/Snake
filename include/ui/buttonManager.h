@@ -66,14 +66,14 @@ public :
     /**
      * @brief Met à jour le delai de navigation et le processus de l'input
      */
-    void update(InputMenu input);
+    void update(InputMenu input, float deltaTime);
 
     /**
      * @brief Déplace tous les Button 
      * @param velocity vitesse de déplacement dans une direction précise
      * @note ajoute la velocity à la position
      */
-    void moveTo(Vector2f velocity);
+    void moveTo(Vector2f velocity, float deltaTime);
 
     /**
      * @brief Laps de temps après avoir selectionné un bouton

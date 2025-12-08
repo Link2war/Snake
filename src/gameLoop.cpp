@@ -6,7 +6,9 @@ GameLoop::GameLoop(GLFWwindow * _window) :
     gameplay(scoreData),
     mainMenu(scoreData),
     settingsScreen(),
-    state(LoopState::MainMenu)
+    state(LoopState::MainMenu),
+    deltaTime(0.0f),
+    lastTime(glfwGetTime())
 {
     std::cout << "boucle de jeu initialisée" << std::endl;
 }
@@ -22,6 +24,8 @@ void GameLoop::run()
     {
         // clear de la fenêtre en noire
         bbopCleanWindow(window,Vector3i(0,0,0),1.0f);
+
+        updateDeltaTime();
 
         switch (state)
         {
@@ -57,12 +61,19 @@ void GameLoop::run()
     }
 }
 
+void GameLoop::updateDeltaTime()
+{
+    float time = glfwGetTime();
+    deltaTime = time - lastTime;
+    lastTime = time;
+}
+
 void GameLoop::updateMenu()
 {
-    mainMenu.update(window);
+    mainMenu.update(window, deltaTime);
 
     if (mainMenu.getState() == MenuState::Out) {
-        mainMenu.transitionIn();
+        mainMenu.transitionIn(deltaTime);
     }
 
     if (mainMenu.getState() == MenuState::In) 
@@ -75,7 +86,7 @@ void GameLoop::updateMenu()
         {
             if (mainMenu.selectDelayOver()) 
             {
-                mainMenu.transitionOut();
+                mainMenu.transitionOut(deltaTime);
                 if (mainMenu.transitionComplete()) {
                     state = LoopState::Settings;
                 }
@@ -86,7 +97,7 @@ void GameLoop::updateMenu()
         {
             if (mainMenu.selectDelayOver()) 
             {
-                mainMenu.transitionOut();
+                mainMenu.transitionOut(deltaTime);
                 if (mainMenu.transitionComplete()) {
                     state = LoopState::Game;
                 }
@@ -104,7 +115,7 @@ void GameLoop::updateSettings()
 
 void GameLoop::updateGame()
 {
-    gameplay.update(window);
+    gameplay.update(window, deltaTime);
     
     if (gameplay.getState() == GameplayState::GameOver && glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
         state = LoopState::MainMenu;

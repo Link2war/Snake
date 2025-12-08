@@ -24,14 +24,14 @@ void ScoreManagerMenu::Draw(GLint* renderUniform) const
     totalScoreBox.Draw(renderUniform);
 }
 
-void ScoreManagerMenu::moveTo(Vector2f velocity)
+void ScoreManagerMenu::moveTo(Vector2f velocity, float deltaTime)
 {
     Vector2f pos = lastScoreBox.getPosition();
-    lastScoreBox.setPosition(Vector2f(pos.x + velocity.x, pos.y + velocity.y));
+    lastScoreBox.setPosition(Vector2f(pos.x + velocity.x*deltaTime, pos.y + velocity.y*deltaTime));
 
      pos = bestScoreBox.getPosition();
-    bestScoreBox.setPosition(Vector2f(pos.x + velocity.x, pos.y + velocity.y));
+    bestScoreBox.setPosition(Vector2f(pos.x + velocity.x*deltaTime, pos.y + velocity.y*deltaTime));
 
     pos = totalScoreBox.getPosition();
-    totalScoreBox.setPosition(Vector2f(pos.x + velocity.x, pos.y + velocity.y));
+    totalScoreBox.setPosition(Vector2f(pos.x + velocity.x*deltaTime, pos.y + velocity.y*deltaTime));
 }

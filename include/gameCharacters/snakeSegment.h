@@ -58,7 +58,7 @@ public :
      * @note - des différentes positions du Block
      * @note - de la position du Sprite
      */
-    void update(); 
+    void update(float deltaTime); 
 
     /**
      * @brief Met à jour la rotation du Block
@@ -68,7 +68,7 @@ public :
     /**
      * @brief Mise à jour de déplacement
      */
-    void updateCurrentPosition();
+    void updateCurrentPosition(float deltaTime);
 
     /**
      * @brief Met à jour la case de départ du Block

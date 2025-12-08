@@ -39,13 +39,13 @@ void Snake::Draw(GLint* renderUniform) const
     }
 }
 
-void Snake::update(Vector2i inputDirection)
+void Snake::update(Vector2i inputDirection, float deltaTime)
 {
     if (segments.front().onCell()) {
         updateFrontDirection(inputDirection);
     }
     
-    updateBody();
+    updateBody(deltaTime);
 }
 
 void Snake::updateFrontDirection(Vector2i inputDirection)
@@ -60,9 +60,9 @@ void Snake::updateFrontDirection(Vector2i inputDirection)
     segments.front().setDirection(newDirection);
 }
 
-void Snake::updateBody()
+void Snake::updateBody(float deltaTime)
 {
-    segments.front().update();
+    segments.front().update(deltaTime);
 
     Vector2i direction = segments.front().getDirection();
 
@@ -84,7 +84,7 @@ void Snake::updateBody()
         }
 
         // met à jour la position des SnakeSegments et de leur Sprite
-        segments[i].update();
+        segments[i].update(deltaTime);
     }
 }
 

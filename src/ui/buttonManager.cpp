@@ -69,7 +69,7 @@ void ButtonManager::processInput(InputMenu input)
     }
 }
 
-void ButtonManager::update(InputMenu input)
+void ButtonManager::update(InputMenu input, float deltaTime)
 {
     if (!canNavigate) {
         updateNavigateDelay(input);
@@ -80,11 +80,11 @@ void ButtonManager::update(InputMenu input)
     }
 }
 
-void ButtonManager::moveTo(Vector2f velocity)
+void ButtonManager::moveTo(Vector2f velocity, float deltaTime)
 {
     for (const auto& b : buttons) {
         Vector2f pos = b->getPosition();
-        b->setPosition(Vector2f(pos.x + velocity.x, pos.y + velocity.y));
+        b->setPosition(Vector2f(pos.x + velocity.x*deltaTime, pos.y + velocity.y*deltaTime));
     }
 }
 

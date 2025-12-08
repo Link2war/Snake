@@ -8,7 +8,7 @@ Gameplay::Gameplay(ScoreData& sharedScoreData) :
     scoreData(sharedScoreData),
     scoreManager(&scoreData, 50, "assets/fonts/Ghrathe.ttf", Vector2f(50, 200)),
     background(Sprite("assets/sprites/background/0.png")),
-    ground(Sprite("assets/sprites/ground/0.png")),
+    ground(Sprite("assets/sprites/board/0.png")),
     fruit(Sprite("assets/sprites/fruit/0.png")),
     score(0),
     offsetX((BBOP_WINDOW_RESOLUTION.x - ground.getSize().x) / 2),
@@ -58,12 +58,12 @@ void Gameplay::Draw()
     scene.render();
 }
 
-void Gameplay::update(GLFWwindow * window)
+void Gameplay::update(GLFWwindow * window, float deltaTime)
 {
     inputManager.update(window);
 
     if (state == GameplayState::play) {
-        updateSnake();
+        updateSnake(deltaTime);
     }
     if (state == GameplayState::GameOver) {
         if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
@@ -80,9 +80,9 @@ void Gameplay::updateScore()
     scoreManager.refreshFromData();
 }
 
-void Gameplay::updateSnake()
+void Gameplay::updateSnake(float deltaTime)
 {
-    snake.update(inputManager.getInput());
+    snake.update(inputManager.getInput(), deltaTime);
 
     if (snake.collideFruit(fruit.getPosition())) {
         snake.addSegment();

@@ -80,7 +80,7 @@ public :
      * @note - met à jour l'input de direction
      * @note - met à jour l'etat de partie Gameplay
      */
-    void update(GLFWwindow * window); 
+    void update(GLFWwindow * window, float deltaTime); 
 
     /**
      * @brief Met à jour le scoreManager
@@ -90,7 +90,7 @@ public :
     /**
      * @brief Met à jour le Snake
      */
-    void updateSnake();
+    void updateSnake(float deltaTime);
 
     /**
      * @brief Modifie la position du fruit sur le plateau

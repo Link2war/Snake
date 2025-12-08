@@ -55,7 +55,7 @@ public :
      * @note - Met à jour le délai de changement de bouton
      * @note - Met à jour le bouton survolé
      */
-    void update(GLFWwindow * window);
+    void update(GLFWwindow * window, float deltaTime);
 
     /**
      * @brief Met à jour le score du Mainmenu
@@ -66,13 +66,13 @@ public :
      * @brief Gère la transition du MainMenu vers un autre état de la Game
      * @note déplace tous les éléments de la scène vers le haut
      */
-    void transitionOut();
+    void transitionOut(float deltaTime);
 
     /**
      * @brief Gère la transition d'un etat de la Game vers le Mainmenu
      * @note déplace tous les éléments de la scène vers le bas
      */
-    void transitionIn();
+    void transitionIn(float deltaTime);
 
     /**
      * @brief Retourne l'état de la transition Out si elle est terminé ou non

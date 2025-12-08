@@ -21,5 +21,5 @@ public :
 
     virtual void Draw(GLint* renderUniform) const override;
 
-    void moveTo(Vector2f velocity);
+    void moveTo(Vector2f velocity, float deltaTime);
 };

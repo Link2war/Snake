@@ -5,7 +5,7 @@ std::unique_ptr<Texture> SnakeSegment::textures[3];
 
 SnakeSegment::SnakeSegment(BodyPart bodyPart, Vector2f position) :
     sprite(*textures[int(bodyPart)]),
-    speed(4),
+    speed(32/8*60),
     direction(Vector2i(0, 0)),
     startPosition(position),
     currentPosition(position),
@@ -37,9 +37,9 @@ void SnakeSegment::Draw(GLint* renderUniform) const
     sprite.Draw(renderUniform);
 }
 
-void SnakeSegment::update()
+void SnakeSegment::update(float deltaTime)
 {
-    updateCurrentPosition();
+    updateCurrentPosition(deltaTime);
     sprite.setPosition(currentPosition.x, currentPosition.y);
 
     if (onCell()) {
@@ -64,14 +64,16 @@ void SnakeSegment::updateRotation()
     }
 }
 
-void SnakeSegment::updateCurrentPosition()
+void SnakeSegment::updateCurrentPosition(float deltaTime)
 {
     if (onCell()) {
         updateRotation();
     }
 
     Vector2f velocity = Vector2f(speed*direction.x, speed*direction.y);
-    currentPosition = Vector2f(currentPosition.x + velocity.x, currentPosition.y + velocity.y);
+
+    currentPosition.x += std::round(velocity.x*deltaTime);
+    currentPosition.y += std::round(velocity.y*deltaTime);
 }
 
 void SnakeSegment::updateStartPosition()
@@ -97,7 +99,12 @@ void SnakeSegment::setTexture(BodyPart bodyPart)
 
 bool SnakeSegment::onCell() const
 {
-    return (int(currentPosition.x - 16) %32 == 0 && int(currentPosition.y + 8) %32 == 0);
+    Vector2f origin = sprite.getOrigin();
+    float rx = std::round(currentPosition.x / 32.0f) * 32.0f -origin.x;
+    float ry = std::round(currentPosition.y / 32.0f) * 32.0f -origin.y+8;
+
+    // vérfie la valeur absolue
+    return (std::abs(currentPosition.x - rx) < 0.1f && std::abs(currentPosition.y - ry) < 0.1f);
 }
 
 Vector2f SnakeSegment::getStartPosition() const

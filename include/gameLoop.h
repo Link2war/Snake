@@ -27,6 +27,10 @@ private:
     SettingsMenu settingsScreen; // settings
     LoopState state; // état de la boucle de jeu
 
+    float deltaTime;
+
+    float lastTime;
+
 public:
     /**
      * @brief Constructeur de la classe GameLoop
@@ -50,6 +54,8 @@ public:
      * @note Gère les différents états du jeu
      */
     void run();
+
+    void updateDeltaTime();
 
     /**
      * @brief Met à jour le menu
