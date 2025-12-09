@@ -1,6 +1,6 @@
 #include <BBOP/Graphics.h>
 
-#include "include/gameLoop.h"
+#include "include/core/gameLoop.h"
 
 
 int main()

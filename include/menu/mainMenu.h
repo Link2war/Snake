@@ -1,19 +1,12 @@
 #pragma once
 
 #include <BBOP/Graphics.h>
+#include "menuState.h"
 #include "../ui/buttonManager.h"
-#include "../ui/scoreManagerMenu.h"
-#include "inputManagerMenu.h"
+#include "managers/menuScoreManager.h"
+#include "managers/menuTimeManager.h"
+#include "input/menuInputManager.h"
 
-
-/**
- * @brief états du MainMenu
- */
-enum class MenuState
-{
-    In,
-    Out
-};
 
 class MainMenu
 {
@@ -22,8 +15,10 @@ private :
     Sprite board; // panneau du MainMenu
     MenuState state; // état du MainMenu
     ScoreData scoreData; // données du score (variable de GameLoop)
-    ScoreManagerMenu scoreManager; // gère le score du Mainmenu
-    InputManagerMenu inputManager; // gère les inputs du Mainmenu
+    TimeData timeData;
+    MenuScoreManager scoreManager; // gère le score du Mainmenu
+    MenuTimeManager timeManager;
+    MenuInputManager inputManager; // gère les inputs du Mainmenu
     ButtonManager buttonManager; // gère les boutons du Mainmenu
 
     // Sprite background // nuages à déplacer
@@ -36,7 +31,7 @@ public :
      * @note Initialise les boutons du MainMenu
      * @note Créer une liste chaînée circulaire en reliant le premier pointeur vers le dernier
      */
-    MainMenu(ScoreData& sharedScoreData);
+    MainMenu(ScoreData& sharedScoreData, TimeData& sharedTimeData);
 
     /**
      * @brief Destructeur de la classe MainMenu

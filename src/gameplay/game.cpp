@@ -1,0 +1,155 @@
+#include "../../include/gameplay/game.h"
+
+
+Game::Game(ScoreData& sharedScoreData, TimeData& sharedTimeData) :
+    scene(),
+    state(GameplayState::Waiting),
+    inputManager(),
+    scoreData(sharedScoreData),
+    timeData(sharedTimeData),
+    scoreManager(&scoreData, 50, "assets/fonts/Ghrathe.ttf", Vector2f(50, 300)),
+    timeManager(&timeData, 50, "assets/fonts/Ghrathe.ttf", Vector2f(50, 100)),
+    background(Sprite("assets/sprites/background/0.png")),
+    ground(Sprite("assets/sprites/board/0.png")),
+    fruit(Sprite("assets/sprites/fruit/0.png")),
+    score(0),
+    startTime(0.f),
+    time(0.f),
+    offsetX((BBOP_WINDOW_RESOLUTION.x - ground.getSize().x) / 2),
+    offsetY((BBOP_WINDOW_RESOLUTION.y - ground.getSize().y) / 2),
+    snake(Snake(Vector2f((offsetX + ground.getSize().x/2 - 80), offsetY + (ground.getSize().y/2)+16)))
+{
+    ground.setPosition(offsetX, offsetY);
+
+    // ground.getSize().x-y/2 milieu du plateau
+    // +96 = 32*3 -> trois cases vers la droite
+    fruit.setPosition(offsetX + ground.getSize().x/2 + 112, offsetY + ground.getSize().y/2 +16);
+    Vector2f fruitSize = fruit.getSize();
+    fruit.setOrigin(fruitSize.x/2, fruitSize.y/2);
+
+    std::cout << "Game Initialisée" << std::endl;
+}
+
+Game::~Game()
+{
+    std::cout << "Game supprimée" << std::endl;
+}
+
+void Game::reset()
+{
+
+    state = GameplayState::play;
+    score = 0;
+    time = 0;
+
+    // réinitialiser l'inputManager
+
+    snake.reset();
+    fruit.setPosition(offsetX + ground.getSize().x/2 + 96+16, offsetY + ground.getSize().y/2+16);
+}
+
+
+void Game::Draw()
+{
+    scene.Use();
+    
+    scene.Draw(background);
+    scene.Draw(ground);
+
+    scene.Draw(snake);
+    scene.Draw(scoreManager);
+    scene.Draw(timeManager);
+
+    scene.Draw(fruit);
+    scene.render();
+}
+
+void Game::update(GLFWwindow * window, float deltaTime)
+{
+    inputManager.update(window);
+
+    if (state == GameplayState::Waiting && (inputManager.getInput().x != 0 || inputManager.getInput().y != 0)) {
+        startTime = glfwGetTime();
+        state = GameplayState::play;
+    }
+    if (state == GameplayState::play) {
+        updateTime();
+        updateSnake(deltaTime);
+    }
+    if (state == GameplayState::GameOver) {
+        if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
+            reset();
+        }
+    }
+}
+
+void Game::updateScore()
+{
+    scoreData.setGameplayScore(score);
+    scoreData.updateBestScore();
+    scoreData.updateTotalScore();
+    scoreManager.refreshFromData();
+}
+
+void Game::updateTime()
+{
+    time = glfwGetTime() - startTime;
+    timeData.setGameplayTime(time);
+    timeData.updateBestTime();
+    timeManager.refreshFromData();
+}
+
+void Game::updateSnake(float deltaTime)
+{
+    snake.update(inputManager.getInput(), deltaTime);
+
+    if (snake.collideFruit(fruit.getPosition())) {
+        snake.addSegment();
+        score++;
+        updateScore();
+        updateFruit();
+    }
+        
+    if (snake.isDead(offsetX, offsetY)) {
+        handleGameplayOver();
+    }
+}
+
+void Game::updateFruit()
+{
+    // chaque case fait 32 pixels
+    // + offset pour être dans le cadre de jeu
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> distrib2(0, 1);
+    std::uniform_int_distribution<> distrib16(0, 15);
+    int x = distrib16(gen) * 32 + offsetX + fruit.getOrigin().x;
+    int y = distrib16(gen) * 32 + offsetY + fruit.getOrigin().y;
+
+
+    while (snake.collideFruit(Vector2f(x, y)))
+    {
+        int random = distrib2(gen);
+
+        if (random == 0) {
+            x = distrib16(gen) * 32 + offsetX + fruit.getOrigin().x;
+        } 
+        else {
+            y = distrib16(gen) * 32 + offsetY + fruit.getOrigin().y;
+        }
+    }
+
+    fruit.setPosition(x, y);
+}
+
+GameplayState Game::getState()
+{
+    return state;
+}
+
+void Game::handleGameplayOver()
+{
+    state = GameplayState::GameOver;
+    std::cout << "Vous êtes mort" << std::endl;
+}

@@ -7,7 +7,7 @@ LIBS = /usr/local/lib/libbbop.a \
        /usr/local/lib/libLDtkLoader.a
 
 # --- SOURCES ---
-SRCS = main.cpp $(wildcard src/*.cpp src/*/*.cpp)
+SRCS = main.cpp $(wildcard src/*.cpp src/*/*.cpp src/*/*/*.cpp)
 OBJDIR = build
 OBJS = $(SRCS:%.cpp=$(OBJDIR)/%.o)
 TARGET = final

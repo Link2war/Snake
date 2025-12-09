@@ -6,8 +6,8 @@
 class SettingsMenu
 {
     private :
-        Sprite * background;
-        Sprite * Retour;
+        Sprite background;
+        Sprite Retour;
 
     public :
         SettingsMenu();

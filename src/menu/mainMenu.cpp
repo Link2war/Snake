@@ -2,12 +2,14 @@
 #include <fstream>
 
 
-MainMenu::MainMenu(ScoreData& sharedScoreData) :
+MainMenu::MainMenu(ScoreData& sharedScoreData, TimeData& sharedTimeData) :
     scene(),
     board(Sprite("assets/sprites/iu/board.png")),
     state(MenuState::In),
     scoreData(sharedScoreData),
-    scoreManager(&scoreData, 50, "assets/fonts/Ghrathe.ttf", Vector2f(600, 300), Vector2f(600, 350), Vector2f(600, 400)),
+    timeData(sharedTimeData),
+    scoreManager(&scoreData, 25, "assets/fonts/Ghrathe.ttf", Vector2f(600, 300), Vector2f(600, 350), Vector2f(600, 400)),
+    timeManager(&timeData, 25, "assets/fonts/Ghrathe.ttf", Vector2f(900, 300), Vector2f(900, 350), Vector2f(900, 400)),
     buttonManager(),
     
     speedTransition(30)
@@ -25,6 +27,7 @@ void MainMenu::Draw()
     scene.Use();
     scene.Draw(board);
     scene.Draw(scoreManager);
+    scene.Draw(timeManager);
     scene.Draw(buttonManager);
     scene.render();
 }
@@ -55,6 +58,7 @@ void MainMenu::transitionOut(float deltaTime)
         board.setPosition(boardPos.x + velocity.x*deltaTime, boardPos.y + velocity.y*deltaTime);
         buttonManager.moveTo(velocity, deltaTime);
         scoreManager.moveTo(velocity, deltaTime);
+        timeManager.moveTo(velocity, deltaTime);
         speedTransition+=20;
     }
     else {
@@ -76,7 +80,7 @@ void MainMenu::transitionIn(float deltaTime)
         board.setPosition(boardPos.x + velocity.x*deltaTime, boardPos.y + velocity.y*deltaTime);
         buttonManager.moveTo(velocity, deltaTime);
         scoreManager.moveTo(velocity, deltaTime);
-
+        timeManager.moveTo(velocity, deltaTime);
         speedTransition+=20;
     }
     else {
