@@ -43,11 +43,11 @@ std::string to_string(ButtonName name);
 class Button : public BbopDrawable
 {
 private :
-    static std::unique_ptr<Texture> textures[3][3]; // textures[name][state]
+    static std::unique_ptr<Texture> m_textures[3][3]; // textures[name][state]
 
-    ButtonName name; // nom du bouton
-    ButtonState state; // etat du bouton (activé / désactivé)
-    Sprite sprite; // sprite du bouton
+    ButtonName m_name; // nom du bouton
+    ButtonState m_state; // etat du bouton (activé / désactivé)
+    Sprite m_sprite; // sprite du bouton
 
 public :
     /**
@@ -56,7 +56,7 @@ public :
      * @param state Etat du Button
      * @param position Position du Button
      */
-    Button(ButtonName _name, ButtonState _state, Vector2f position);
+    Button(ButtonName name, ButtonState state, Vector2f position);
 
     /**
      * @brief Destructeur de la classe Button

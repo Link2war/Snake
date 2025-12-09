@@ -2,31 +2,28 @@
 
 
 Game::Game(ScoreData& sharedScoreData, TimeData& sharedTimeData) :
-    scene(),
-    state(GameplayState::Waiting),
-    inputManager(),
-    scoreData(sharedScoreData),
-    timeData(sharedTimeData),
-    scoreManager(&scoreData, 50, "assets/fonts/Ghrathe.ttf", Vector2f(50, 300)),
-    timeManager(&timeData, 50, "assets/fonts/Ghrathe.ttf", Vector2f(50, 100)),
-    background(Sprite("assets/sprites/background/0.png")),
-    ground(Sprite("assets/sprites/board/0.png")),
-    fruit(Sprite("assets/sprites/fruit/0.png")),
-    score(0),
-    startTime(0.f),
-    time(0.f),
-    offsetX((BBOP_WINDOW_RESOLUTION.x - ground.getSize().x) / 2),
-    offsetY((BBOP_WINDOW_RESOLUTION.y - ground.getSize().y) / 2),
-    snake(Snake(Vector2f((offsetX + ground.getSize().x/2 - 80), offsetY + (ground.getSize().y/2)+16)))
+    m_scene(),
+    m_state(GameplayState::Waiting),
+    m_scoreData(sharedScoreData),
+    m_timeData(sharedTimeData),
+    m_scoreManager(&m_scoreData, 50, "assets/fonts/Ghrathe.ttf", Vector2f(50, 300)),
+    m_timeManager(&m_timeData, 50, "assets/fonts/Ghrathe.ttf", Vector2f(50, 100)),
+    m_inputManager(),
+
+    m_boardTexture("assets/sprites/board/0.png"),
+    m_itemTexture("assets/sprites/fruit/0.png"),
+
+    m_board(m_boardTexture, 32.f),
+    m_snake(Snake(m_board, Vector2f(6, 8))),
+    m_fruit(m_itemTexture, Vector2f(m_board.getPosition().x + m_board.getCellSize()*12-16, m_board.getPosition().y + m_board.getCellSize()*8-16 )),
+
+    m_background(Sprite("assets/sprites/background/0.png")),
+    
+
+    m_timer(),
+    m_time(0.f),
+    m_score(0)
 {
-    ground.setPosition(offsetX, offsetY);
-
-    // ground.getSize().x-y/2 milieu du plateau
-    // +96 = 32*3 -> trois cases vers la droite
-    fruit.setPosition(offsetX + ground.getSize().x/2 + 112, offsetY + ground.getSize().y/2 +16);
-    Vector2f fruitSize = fruit.getSize();
-    fruit.setOrigin(fruitSize.x/2, fruitSize.y/2);
-
     std::cout << "Game Initialisée" << std::endl;
 }
 
@@ -38,118 +35,91 @@ Game::~Game()
 void Game::reset()
 {
 
-    state = GameplayState::play;
-    score = 0;
-    time = 0;
+    m_state = GameplayState::play;
+    m_score = 0;
+    m_timer.reset();
 
-    // réinitialiser l'inputManager
+    updateScore();
+    updateTime();
+    // réinitialiser l'm_inputManager
 
-    snake.reset();
-    fruit.setPosition(offsetX + ground.getSize().x/2 + 96+16, offsetY + ground.getSize().y/2+16);
+    m_snake.reset();
+    m_fruit.reset();
 }
 
 
 void Game::Draw()
 {
-    scene.Use();
+    m_scene.Use();
     
-    scene.Draw(background);
-    scene.Draw(ground);
+    m_scene.Draw(m_background);
+    m_scene.Draw(m_board);
+    m_scene.Draw(m_scoreManager);
+    m_scene.Draw(m_timeManager);
+    m_scene.Draw(m_fruit);
+    m_scene.Draw(m_snake);
 
-    scene.Draw(snake);
-    scene.Draw(scoreManager);
-    scene.Draw(timeManager);
-
-    scene.Draw(fruit);
-    scene.render();
+    m_scene.render();
 }
 
 void Game::update(GLFWwindow * window, float deltaTime)
 {
-    inputManager.update(window);
+    m_inputManager.update(window);
 
-    if (state == GameplayState::Waiting && (inputManager.getInput().x != 0 || inputManager.getInput().y != 0)) {
-        startTime = glfwGetTime();
-        state = GameplayState::play;
+    if (m_state == GameplayState::Waiting && (m_inputManager.getInput().x != 0 || m_inputManager.getInput().y != 0)) {
+        m_timer.reset();
+        m_state = GameplayState::play;
     }
-    if (state == GameplayState::play) {
+    if (m_state == GameplayState::play) {
         updateTime();
         updateSnake(deltaTime);
-    }
-    if (state == GameplayState::GameOver) {
-        if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
-            reset();
-        }
     }
 }
 
 void Game::updateScore()
 {
-    scoreData.setGameplayScore(score);
-    scoreData.updateBestScore();
-    scoreData.updateTotalScore();
-    scoreManager.refreshFromData();
+    m_scoreData.setLastScore(m_score);
+    m_scoreData.updateBestScore();
+    m_scoreData.updateTotalScore();
+    m_scoreManager.refreshFromData();
 }
 
 void Game::updateTime()
 {
-    time = glfwGetTime() - startTime;
-    timeData.setGameplayTime(time);
-    timeData.updateBestTime();
-    timeManager.refreshFromData();
+    m_time = m_timer.elapsed();
+    m_timeData.setLastTime(m_time);
+    m_timeData.updateBestTime();
+    m_timeManager.refreshFromData();
 }
 
 void Game::updateSnake(float deltaTime)
 {
-    snake.update(inputManager.getInput(), deltaTime);
+    m_snake.update(m_inputManager.getInput(), deltaTime);
 
-    if (snake.collideFruit(fruit.getPosition())) {
-        snake.addSegment();
-        score++;
+    if (m_snake.collideFruit(m_fruit.getPosition())) {
+        m_snake.addSegment();
+        m_score++;
         updateScore();
-        updateFruit();
+        moveItem();
     }
         
-    if (snake.isDead(offsetX, offsetY)) {
+    if (m_snake.isDead(m_board.getPosition().x, m_board.getPosition().y)) {
         handleGameplayOver();
     }
 }
 
-void Game::updateFruit()
+void Game::moveItem()
 {
-    // chaque case fait 32 pixels
-    // + offset pour être dans le cadre de jeu
-
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> distrib2(0, 1);
-    std::uniform_int_distribution<> distrib16(0, 15);
-    int x = distrib16(gen) * 32 + offsetX + fruit.getOrigin().x;
-    int y = distrib16(gen) * 32 + offsetY + fruit.getOrigin().y;
-
-
-    while (snake.collideFruit(Vector2f(x, y)))
-    {
-        int random = distrib2(gen);
-
-        if (random == 0) {
-            x = distrib16(gen) * 32 + offsetX + fruit.getOrigin().x;
-        } 
-        else {
-            y = distrib16(gen) * 32 + offsetY + fruit.getOrigin().y;
-        }
-    }
-
-    fruit.setPosition(x, y);
+    m_fruit.setPosition(m_board.getPosition(), m_board.getCellSize());
 }
 
 GameplayState Game::getState()
 {
-    return state;
+    return m_state;
 }
 
 void Game::handleGameplayOver()
 {
-    state = GameplayState::GameOver;
+    m_state = GameplayState::GameOver;
     std::cout << "Vous êtes mort" << std::endl;
 }

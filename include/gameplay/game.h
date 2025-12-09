@@ -1,11 +1,14 @@
 #pragma once
 
 #include <BBOP/Graphics.h>
-#include "gameplayState.h"
+#include "../utils/timer.h"
+#include "gameplay_state.h"
+#include "../core/input/input_manager.h"
+#include "managers/game_score_manager.h"
+#include "managers/game_time_manager.h"
+#include "game_board.h"
 #include "../entities/snake/snake.h"
-#include "../core/input/inputManager.h"
-#include "managers/gameScoreManager.h"
-#include "managers/gameTimeManager.h"
+#include "items/game_item.h"
 
 #include <random>
 
@@ -15,26 +18,29 @@
 class Game
 {
 private :
-    Scene scene; // Scène de jeu
-    GameplayState state; // état de Gameplay
-    InputManager inputManager; // input de Gameplay
-    ScoreData scoreData; // Donées des scores (variable de GameplayLoop)
-    TimeData timeData;
-    GameScoreManager scoreManager; // gère le score de la partie
-    GameTimeManager timeManager;
+    Scene m_scene; // Scène de jeu
+    GameplayState m_state; // état de Gameplay
+    
+    ScoreData m_scoreData; // Donées des scores (variable de GameplayLoop)
+    TimeData m_timeData;
 
-    Sprite background; // Sprite de l'arrière plan
-    Sprite ground; // Sprite du sol (premier plan)
-    Sprite fruit; // Sprite du fruit
+    GameScoreManager m_scoreManager; // gère le score de la partie
+    GameTimeManager m_timeManager;
+    InputManager m_inputManager; // input de Gameplay
 
-    int score; // score de la partie
-    float startTime;
-    float time;
+    Texture m_boardTexture;
+    Texture m_itemTexture;
 
-    float offsetX; // Offset de largeur
-    float offsetY; // Offset de hauteur
+    GameBoard m_board;
+    Snake m_snake; // Pointeur du serpent utilisé par le joueur
+    GameItem m_fruit;
 
-    Snake snake; // Pointeur du serpent utilisé par le joueur
+    Sprite m_background; // Sprite du sol (premier plan)
+    
+
+    Timer m_timer;
+    float m_time;
+    int m_score; // score de la partie
 
 
 public :
@@ -98,7 +104,7 @@ public :
      * @brief Modifie la position du fruit sur le plateau
      * @note Déplace le fruit sur une case vide choisie aléatoirement
      */
-    void updateFruit();
+    void moveItem();
 
     /**
      * @brief Retourne l'Etat de la partie

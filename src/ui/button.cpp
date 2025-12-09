@@ -1,6 +1,6 @@
 #include "../../include/ui/button.h"
 
-std::unique_ptr<Texture> Button::textures[3][3];
+std::unique_ptr<Texture> Button::m_textures[3][3];
 
 const char* buttonName[] = {
     "play",
@@ -13,10 +13,10 @@ std::string to_string(ButtonName name)
     return buttonName[static_cast<int>(name)];
 }
 
-Button::Button(ButtonName _name, ButtonState _state, Vector2f position) :
-    name(_name),
-    state(_state),
-    sprite(*textures[(int)name][(int)state], position)
+Button::Button(ButtonName name, ButtonState state, Vector2f position) :
+    m_name(name),
+    m_state(state),
+    m_sprite(*m_textures[(int)name][(int)state], position)
 {
 
 }
@@ -27,51 +27,51 @@ void Button::initTextures()
     {
         std::string base = "assets/sprites/iu/button/" + to_string((ButtonName)n) + "/";
 
-        textures[n][0] = std::make_unique<Texture>((base + "0.png").c_str());
-        textures[n][1] = std::make_unique<Texture>((base + "1.png").c_str());
-        textures[n][2] = std::make_unique<Texture>((base + "2.png").c_str());
+        m_textures[n][0] = std::make_unique<Texture>((base + "0.png").c_str());
+        m_textures[n][1] = std::make_unique<Texture>((base + "1.png").c_str());
+        m_textures[n][2] = std::make_unique<Texture>((base + "2.png").c_str());
     }
 }
 
 void Button::Draw(GLint* renderUniform) const
 {
-    sprite.Draw(renderUniform);
+    m_sprite.Draw(renderUniform);
 }
 
 void Button::setPosition(Vector2f position)
 {
-    sprite.setPosition(position);
+    m_sprite.setPosition(position);
 }
 
 void Button::activate()
 {
-    state = ButtonState::On;
-    sprite.setTexture(*textures[(int)name][(int)state]);
+    m_state = ButtonState::On;
+    m_sprite.setTexture(*m_textures[(int)m_name][(int)m_state]);
 }
 
 void Button::desactivate()
 {
-    state = ButtonState::Off;
-    sprite.setTexture(*textures[(int)name][(int)state]);
+    m_state = ButtonState::Off;
+    m_sprite.setTexture(*m_textures[(int)m_name][(int)m_state]);
 }
 
 void Button::select()
 {
-    state = ButtonState::Select;
-    sprite.setTexture(*textures[(int)name][(int)state]);
+    m_state = ButtonState::Select;
+    m_sprite.setTexture(*m_textures[(int)m_name][(int)m_state]);
 }
 
 Vector2f Button::getPosition() const
 {
-    return sprite.getPosition();
+    return m_sprite.getPosition();
 }
 
 ButtonName Button::getName() const
 {
-    return name;
+    return m_name;
 }
 
 ButtonState Button::getState() const
 {
-    return state;
+    return m_state;
 }

@@ -1,15 +1,16 @@
 #pragma once
 
 #include <BBOP/Graphics.h>
-#include "snakeSegment.h"
 #include <deque>
+#include "snake_segment.h"
+#include "../../gameplay/game_board.h"
 
 
 class Snake : public BbopDrawable
 {
     private :
-        std::deque<SnakeSegment> segments; // tableau de Block
-        Vector2f initPosition; // position initiale du Snake (utilisé pour le reset)
+        std::deque<SnakeSegment> m_segments; // tableau de Block
+        Vector2f m_initPosition; // position initiale du Snake (utilisé pour le reset)
 
     public :
         /**
@@ -20,7 +21,7 @@ class Snake : public BbopDrawable
          * @note - 1 Block pour le corps
          * @note - 1 Block pour la queue
          */
-        Snake(Vector2f position);
+        Snake(GameBoard&  board, Vector2f cellPosition);
 
         /**
          * @brief Destructeur de la classe Snake
